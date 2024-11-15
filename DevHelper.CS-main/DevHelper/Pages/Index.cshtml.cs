@@ -22,9 +22,18 @@ namespace DevHelper.Razor.Shared.Index
         [BindProperty]
         public Login Login { get; set; }
 
+
         public string ErrorMessage { get; set; }
 
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnGetAsync()
+        { // Verifica se o usuário já está autenticado
+          if (User.Identity.IsAuthenticated) 
+            { 
+                return RedirectToPage("/PgProblema/Index"); 
+            } 
+            return Page(); 
+        }
+            public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
             {
@@ -34,7 +43,7 @@ namespace DevHelper.Razor.Shared.Index
             var user = await _loginService.LoginAsync(Login.Email, Login.Senha);
             if (user == null)
             {
-                ErrorMessage = "Credenciais inválidas.";
+                ErrorMessage = "Registro inválido.";
                 return Page();
             }
 

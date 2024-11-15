@@ -56,8 +56,9 @@ body {
     display:flex;
     flex-direction:column;
 }
-.btnLogin{
-    margin-left:500px;
+.BtnLogin{
+    margin-left:300px;
+    max-width:50px
 }
 .btnProblema {
     margin-left: 50px;

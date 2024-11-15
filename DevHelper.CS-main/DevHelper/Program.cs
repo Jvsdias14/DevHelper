@@ -39,6 +39,9 @@ builder.Services.AddScoped<Login>();
 // Registrar o IPasswordHasher
 builder.Services.AddSingleton<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>();
 
+// Registrar o IHttpContextAccessor
+builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
+
 var app = builder.Build();
 
 // Configuração do pipeline de requisições

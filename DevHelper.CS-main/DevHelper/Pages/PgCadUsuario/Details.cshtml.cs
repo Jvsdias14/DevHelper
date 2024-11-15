@@ -5,6 +5,8 @@ using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Authentication;
+using Microsoft.AspNetCore.Authentication.Cookies;
 using DevHelper.Data.Model;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
@@ -37,6 +39,12 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 Usuario = usuario;
             }
             return Page();
+        }
+
+        public async Task<IActionResult> OnPostLogoutAsync()
+        {
+            await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+            return RedirectToPage("../Index");
         }
     }
 }
