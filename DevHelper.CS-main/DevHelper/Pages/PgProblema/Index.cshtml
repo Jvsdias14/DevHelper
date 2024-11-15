@@ -1,0 +1,115 @@
+﻿@page
+@model DevHelper.Razor.Pages.PgProblema.IndexModel
+
+@{
+    ViewData["Title"] = "Feed";
+}
+
+<h1>Feed</h1>
+
+<table class="table">
+    <thead>
+    <tr>
+    <th>
+    Usuário
+    @* @Html.DisplayNameFor(model => model.Problema[0].Usuario) *@
+    </th>
+    <th>
+    Nome do problema
+    @* @Html.DisplayNameFor(model => model.Problema[0].Nome) *@
+    </th>
+    <th>
+    Descrição
+    @* @Html.DisplayNameFor(model => model.Problema[0].Descricao) *@
+    </th>
+    <th></th>
+    </tr>
+    </thead>
+    <tbody>
+        @foreach (var item in Model.Problema)
+        {
+            <tr>
+                <td>
+                    <label class="clickable-label" data-url="@Url.Page("/PgCadUsuario/Details", new { Id = item.Usuario.Id })">
+                        @Html.DisplayFor(modelItem => item.Usuario.Nome)
+                    </label>
+                </td>
+                <td>
+                    <label class="clickable-label" data-url="@Url.Page("/PgProblema/Details", new { Id = item.Id })">
+                        @Html.DisplayFor(modelItem => item.Nome)
+                    </label>
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.Descricao)
+                </td>
+            </tr>
+        }
+    </tbody>
+</table>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.clickable-label').forEach(label => {
+            label.addEventListener('click', function () {
+                window.location.href = this.dataset.url;
+            });
+        });
+    </script>
+}
+
+
+@* @page
+@model DevHelper.Razor.Pages.PgProblema.IndexModel
+
+@{
+    ViewData["Title"] = "Feed";
+}
+
+<h1>Feed</h1>
+
+@* <p>
+    <a asp-page="Create">Create New</a>
+</p> *@
+@* <table class="table"> *@
+    @* <thead>
+    <tr>
+    <th>
+    @Html.DisplayNameFor(model => model.Problema[0].Nome)
+    </th>
+    <th>
+    @Html.DisplayNameFor(model => model.Problema[0].Descricao)
+    </th>
+    <th>
+    @Html.DisplayNameFor(model => model.Problema[0].Usuario)
+    </th>
+    <th></th>
+    </tr>
+    </thead> *@
+    @* <tbody>
+        @foreach (var item in Model.Problema)
+        {
+            <tr>
+                <td>
+                    <a asp-page="PgCadUsuario/Details" asp-route-id="@item.Usuario.Id">@Html.DisplayFor(modelItem => item.Usuario.Nome)</a>
+                </td>
+                <td>
+                    <a asp-page="PgProblema/Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Nome)</a>
+                </td>
+ *@
+                @* <div class="container">
+            Teste tela <a asp-area="" asp-page="/PgProblema/Index">Problema</a>
+            </div> *@
+                @* <td>
+                    @Html.DisplayFor(modelItem => item.Descricao)
+                </td> *@
+
+                @* <td>
+            <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
+            <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
+            <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
+            </td> *@
+         @*    </tr>
+        }
+    </tbody>
+</table> *@
+ 

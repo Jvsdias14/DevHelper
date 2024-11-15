@@ -1,0 +1,66 @@
+html {
+  font-size: 14px;
+}
+
+@media (min-width: 768px) {
+  html {
+    font-size: 16px;
+  }
+}
+
+.btn:focus, .btn:active:focus, .btn-link.nav-link:focus, .form-control:focus, .form-check-input:focus {
+  box-shadow: 0 0 0 0.1rem white, 0 0 0 0.25rem #258cfb;
+}
+
+html {
+  position: relative;
+  min-height: 100%;
+}
+
+body {
+  margin-bottom: 60px;
+}
+
+.pesquisar {
+    margin-right: 5px; /* Ajuste a margem como preferir */
+}
+
+.btnPesquisar {
+    border-radius:8px;
+    padding: 5px
+}
+
+.barraDePesquisar {
+    border-radius: 8px;
+    width: 295px;
+    padding:5px
+}
+
+.menuSuperior {
+    padding: 6px;
+    background-color: rgb(34, 34, 34);
+}
+
+#LogoDaPagina {
+    font-family: 'Russo One',sans-serif;
+    font-size: 32px;
+    color: #22ffb6;
+}
+
+/*.nav-item {
+    margin-bottom: 2px:
+}*/
+
+.MenuSuperior{
+    justify-content: center;
+    display:flex;
+    flex-direction:column;
+}
+.btnLogin{
+    margin-left:500px;
+}
+.btnProblema {
+    margin-left: 50px;
+    width: 190px;
+}
+

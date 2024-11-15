@@ -1,0 +1,44 @@
+﻿@page
+@model DevHelper.Razor.Shared.Index.CreateModel
+
+@{
+    ViewData["Title"] = "Login";
+}
+
+<h1>Login</h1>
+
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="text-danger">
+                    <strong>@Model.ErrorMessage</strong>
+                </div>
+            }
+
+            <div class="form-group">
+                <label asp-for="Login.Email" class="control-label"></label>
+                <input asp-for="Login.Email" class="form-control" />
+                <span asp-validation-for="Login.Email" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="Login.Senha" class="control-label"></label>
+                <input asp-for="Login.Senha" class="form-control" type="password" />
+                <span asp-validation-for="Login.Senha" class="text-danger"></span>
+            </div>
+
+            <div class="form-group">
+                <input type="submit" value="Entrar" class="btn btn-primary" />
+            </div>
+            <a asp-page="/PgCadUsuario/Create">Cadastrar-se</a>
+        </form>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

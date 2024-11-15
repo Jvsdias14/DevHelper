@@ -1,0 +1,43 @@
+﻿@page
+@model DevHelper.Razor.Pages.PgArquivoSolucao.CreateModel
+
+@{
+    ViewData["Title"] = "Create";
+}
+
+<h1>Create</h1>
+
+<h4>ArquivoSolucao</h4>
+<hr />
+<div class="row">
+    <div class="col-md-4">
+        <form method="post">
+            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
+            <div class="form-group">
+                <label asp-for="ArquivoSolucao.SolucaoId" class="control-label"></label>
+                <select asp-for="ArquivoSolucao.SolucaoId" class ="form-control" asp-items="ViewBag.SolucaoId"></select>
+            </div>
+            <div class="form-group">
+                <label asp-for="ArquivoSolucao.Nome" class="control-label"></label>
+                <input asp-for="ArquivoSolucao.Nome" class="form-control" />
+                <span asp-validation-for="ArquivoSolucao.Nome" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <label asp-for="ArquivoSolucao.Referencia" class="control-label"></label>
+                <input asp-for="ArquivoSolucao.Referencia" class="form-control" />
+                <span asp-validation-for="ArquivoSolucao.Referencia" class="text-danger"></span>
+            </div>
+            <div class="form-group">
+                <input type="submit" value="Create" class="btn btn-primary" />
+            </div>
+        </form>
+    </div>
+</div>
+
+<div>
+    <a asp-page="Index">Back to List</a>
+</div>
+
+@section Scripts {
+    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+}

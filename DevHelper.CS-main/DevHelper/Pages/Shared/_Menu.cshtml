@@ -1,0 +1,30 @@
+﻿
+
+<nav 
+    class="menuSuperior">
+    <div class="MenuSuperior">
+        <div class="d-flex justify-content-between align-items-center w-50">
+            <a id="LogoDaPagina" class="navbar-brand" asp-area="" asp-page="/PgProblema/Index">DevHelper</a>
+
+            <ul class="navbar-nav d-flex flex-row align-items-center">
+                <li class="nav-item me-2">
+                    <!-- Margem à direita menor -->
+                    <input class="barraDePesquisar" type="text" id="barraDePesquisa" name="barraDePesquisa" placeholder="Digite para Pesquisar">
+                </li>
+                <li class="nav-item">
+                    <button class="btnProblema" id="btnProblema"><a asp-area="" asp-page="/PgProblema/Index">Search</a></button>
+                </li>
+                <li class="BtnProblema">
+                    <button class="btnProblema" id="btnProblema"><a asp-area="" asp-page="/PgProblema/Create">Adicionar um problema</a></button>
+                </li>
+                
+                <li class="BtnLogin">
+                    @* <button class="btn btn-link">
+                        @Html.ActionLink(item.Usuario.Nome, "Details", "PgCadUsuario", new { usuarioId = item.Usuario.Id }, new { @class = "no-style" })
+                    </button> *@
+                    <button class="btnLogin" id="btnLogin"><a asp-area="" asp-page="/PgCadUsuario/Details">Minha Conta</a></button>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>

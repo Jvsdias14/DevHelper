@@ -1,0 +1,24 @@
+﻿@page
+@model DevHelper.Razor.Pages.PgProblema.DetailsModel
+
+@* @{
+    ViewData["Title"] = "Details";
+} *@
+
+<h1>@Html.DisplayFor(model => model.Problema.Nome)</h1>
+
+<div>
+    <h4>@Html.DisplayFor(model => model.Usuario.Nome)</h4>
+    <hr />
+    
+    <h5 class="col-sm-2">
+        @Html.DisplayNameFor(model => model.Problema.Descricao)
+    </h5>
+    <dd class="col-sm-10">
+        @Html.DisplayFor(model => model.Problema.Descricao)
+    </dd>
+        
+</div>
+<div>
+    <a asp-page="/PgSolucao/Create" asp-route-problemaId="@Model.Problema.Id" asp-route-usuarioId="">Criar Solução</a>
+</div>

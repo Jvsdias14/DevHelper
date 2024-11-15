@@ -1,0 +1,24 @@
+# Ignore arquivos de build e dependências
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+
+# Configurações específicas do Visual Studio
+.vs/
+*.vscode/
+*.user
+*.suo
+*.csproj.user
+
+# Ignore arquivos de log
+*.log
+
+# Ignore o pacote NuGet
+*.nupkg
+project.lock.json
+project.fragment.lock.json
+
+# Configurações de publicação
+.publish/
