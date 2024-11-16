@@ -2,12 +2,11 @@
 @model DevHelper.Razor.Pages.PgCadUsuario.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Cadastro";
 }
 
-<h1>Create</h1>
+<h1>Cadastro do Usuário</h1>
 
-<h4>Usuario</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -40,9 +39,6 @@
     </div>
 </div>
 
-<div>
-    <a asp-page="../Index">Back to List</a>
-</div>
 
 @section Scripts {
     @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}

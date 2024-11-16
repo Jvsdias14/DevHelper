@@ -6,6 +6,7 @@ using DevHelper.Data.Model;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
+using Microsoft.AspNetCore.Authorization;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
@@ -24,9 +25,6 @@ namespace DevHelper.Razor.Pages.PgProblema
 
         [BindProperty]
         public Problema Problema { get; set; } = default!;
-
-        [BindProperty]
-        public Usuario Usuario { get; set; } = default!;  // Adicionado para vincular automaticamente o usuário
 
         public IActionResult OnGet()
         {
@@ -57,6 +55,15 @@ namespace DevHelper.Razor.Pages.PgProblema
 
             Problema.UsuarioId = int.Parse(userId);
             Problema.Usuario = await _context.Usuarios.FindAsync(Problema.UsuarioId);
+
+            // Verificação manual da propriedade de navegação Usuario
+            if (Problema.Usuario == null)
+            {
+                ModelState.AddModelError("Problema.Usuario", "O usuário associado não pôde ser encontrado.");
+            }
+
+            // Remover a propriedade de navegação do ModelState para evitar validação desnecessária
+            ModelState.Remove("Problema.Usuario");
 
             // Log para verificar o estado do problema antes da validação
             _logger.LogInformation($"Pre-Validation - Problema: {Problema.Nome}, Descricao: {Problema.Descricao}, UsuarioId: {Problema.UsuarioId}, Usuario: {Problema.Usuario?.Nome ?? "null"}");

@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.CodeAnalysis.CSharp.Syntax;
 using System.Collections.Generic;
 using System.Security.Claims;
 using System.Threading.Tasks;
@@ -29,9 +30,13 @@ namespace DevHelper.Razor.Shared.Index
         { // Verifica se o usuário já está autenticado
           if (User.Identity.IsAuthenticated) 
             { 
-                return RedirectToPage("/PgProblema/Index"); 
-            } 
-            return Page(); 
+                return RedirectToPage("/PgProblema/Index");
+            }
+            else
+            {
+                return Page();
+            }
+            
         }
             public async Task<IActionResult> OnPostAsync()
         {

@@ -19,6 +19,5 @@ public partial class Problema
 
     public virtual ICollection<Solucao> Solucaos { get; set; } = new List<Solucao>();
 
-    [Required]
     public virtual Usuario Usuario { get; set; } = null!;
 }
