@@ -6,16 +6,19 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DevHelper.Data.Model;
+using Microsoft.AspNetCore.Identity; // Adicione esta linha
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class CreateModel : PageModel
     {
         private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly IPasswordHasher<Usuario> _passwordHasher; // Adicione esta linha
 
-        public CreateModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public CreateModel(DBdevhelperContext context, IPasswordHasher<Usuario> passwordHasher) // Atualize o construtor
         {
             _context = context;
+            _passwordHasher = passwordHasher; // Inicialize o passwordHasher
         }
 
         public IActionResult OnGet()
@@ -33,6 +36,9 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             {
                 return Page();
             }
+
+            // Criptografar a senha
+            Usuario.Senha = _passwordHasher.HashPassword(Usuario, Usuario.Senha);
 
             _context.Usuarios.Add(Usuario);
             await _context.SaveChangesAsync();

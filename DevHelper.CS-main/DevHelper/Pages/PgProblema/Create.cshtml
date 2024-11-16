@@ -2,12 +2,11 @@
 @model DevHelper.Razor.Pages.PgProblema.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Cadastrar Problema";
 }
 
-<h1>Create</h1>
+<h1>Cadastrar Problema</h1>
 
-<h4>Problema</h4>
 <hr />
 <div class="row">
     <div class="col-md-4">
@@ -15,7 +14,8 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Problema.UsuarioId" class="control-label"></label>
-                <select asp-for="Problema.UsuarioId" class ="form-control" asp-items="ViewBag.UsuarioId"></select>
+                <input asp-for="Problema.UsuarioId" class="form-control" readonly />
+                <span asp-validation-for="Problema.UsuarioId" class="text-danger"></span>
             </div>
             <div class="form-group">
                 <label asp-for="Problema.Nome" class="control-label"></label>
@@ -33,8 +33,6 @@
             <h2>Upload de Arquivo</h2>
             <input type="file" id="fileInput" multiple>
             <ul id="fileList"></ul>
-
-
         </form>
     </div>
 </div>
@@ -58,5 +56,7 @@
     });
 </script>
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }

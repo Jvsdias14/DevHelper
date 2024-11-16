@@ -7,20 +7,27 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Http;
 using DevHelper.Data.Model;
+using System.Security.Claims;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class DetailsModel : PageModel
     {
         private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DetailsModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public DetailsModel(DBdevhelperContext context, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public Usuario Usuario { get; set; } = default!;
+        public bool IsCurrentUser { get; set; }
+        public ICollection<Problema> Problemas { get; set; } = default!;
+        public ICollection<Solucao> Solucoes { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,7 +36,10 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 return NotFound();
             }
 
-            var usuario = await _context.Usuarios.FirstOrDefaultAsync(m => m.Id == id);
+            var usuario = await _context.Usuarios
+                .Include(u => u.Problemas)
+                .Include(u => u.Solucaos)
+                .FirstOrDefaultAsync(m => m.Id == id);
             if (usuario == null)
             {
                 return NotFound();
@@ -37,7 +47,13 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             else
             {
                 Usuario = usuario;
+                Problemas = usuario.Problemas;
+                Solucoes = usuario.Solucaos;
+
+                var loggedInUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+                IsCurrentUser = loggedInUserId == Usuario.Id.ToString();
             }
+
             return Page();
         }
 

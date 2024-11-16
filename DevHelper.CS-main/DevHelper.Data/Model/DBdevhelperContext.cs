@@ -135,7 +135,7 @@ public partial class DBdevhelperContext : DbContext
                 .HasMaxLength(50)
                 .IsUnicode(false);
             entity.Property(e => e.Senha)
-                .HasMaxLength(50)
+                .HasMaxLength(200)
                 .IsUnicode(false);
         });
 
