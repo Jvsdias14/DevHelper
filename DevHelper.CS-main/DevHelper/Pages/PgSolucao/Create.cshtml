@@ -5,29 +5,27 @@
     ViewData["Title"] = "Create";
 }
 
-<h1>Create</h1>
-
-<h4>Solucao</h4>
+<h2>Cadastrar Solução</h2>
 <hr />
 <div class="row">
     <div class="col-md-4">
         <form method="post">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Solucao.ProblemaId" class="control-label"></label>
-                <select asp-for="Solucao.ProblemaId" class ="form-control" asp-items="ViewBag.ProblemaId"></select>
+                <label class="control-label">Problema</label>
+                <select asp-for="Solucao.Problema" class ="form-control" asp-items="ViewBag.ProblemaId"></select>
             </div>
-            <div class="form-group">
+            @* <div class="form-group">
                 <label asp-for="Solucao.UsuarioId" class="control-label"></label>
                 <select asp-for="Solucao.UsuarioId" class ="form-control" asp-items="ViewBag.UsuarioId"></select>
-            </div>
+            </div> *@
             <div class="form-group">
-                <label asp-for="Solucao.Descricao" class="control-label"></label>
+                <label class="control-label">Descrição</label>
                 <input asp-for="Solucao.Descricao" class="form-control" />
                 <span asp-validation-for="Solucao.Descricao" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Cadastrar" class="btn btn-primary" />
             </div>
             <h2>Upload de Arquivo</h2>
             <input type="file" id="fileInput" multiple>
@@ -36,9 +34,9 @@
     </div>
 </div>
 
-<div>
+@* <div>
     <a asp-page="Index">Back to List</a>
-</div>
+</div> *@
 
 <script>
     document.getElementById('fileInput').addEventListener('change', function () {
