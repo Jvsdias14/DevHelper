@@ -15,18 +15,20 @@
 
             <ul class="navbar-nav d-flex flex-row align-items-center">
                 <li class="nav-item me-2">
-                    <input class="barraDePesquisar" type="text" id="barraDePesquisa" name="barraDePesquisa" placeholder="Digite para Pesquisar">
+                    <form method="get" asp-page="/PgProblema/Pesquisa" class="d-flex">
+                        <input class="barraDePesquisar" type="text" id="barraDePesquisa" name="query" placeholder="Digite para Pesquisar">
+                        <button type="submit" class="btnProblema">Pesquisar</button>
+                    </form>
                 </li>
-                <li class="nav-item">
-                    <button class="btnProblema" id="btnProblema"><a asp-area="" asp-page="/PgProblema/Index">Pesquisar</a></button>
-                </li>
-                <li class="BtnProblema">
-                    <button class="btnProblema" id="btnProblema"><a asp-area="" asp-page="/PgProblema/Create">Adicionar um problema</a></button>
+                <li class="nav-item me-2">
+                    <form method="get" asp-page="/PgProblema/Create" class="d-flex">
+                        <button type="submit" class="btnProblema">Adicionar um problema</button>
+                    </form>
                 </li>
 
                 @if (!string.IsNullOrEmpty(userId))
                 {
-                    <li class="BtnLogin">
+                    <li class="nav-item me-2">
                         <a asp-page="/PgCadUsuario/Details" asp-route-id="@userId" class="btn btn-link">@userName</a>
                     </li>
                 }

@@ -18,8 +18,4 @@
     </PackageReference>
   </ItemGroup>
 
-  <ItemGroup>
-    <ProjectReference Include="..\DevHelper.Teste\DevHelper.Teste.csproj" />
-  </ItemGroup>
-
 </Project>

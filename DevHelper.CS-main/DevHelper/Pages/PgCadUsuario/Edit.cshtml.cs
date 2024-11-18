@@ -65,7 +65,7 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 }
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("../Index");
         }
 
         private bool UsuarioExists(int id)

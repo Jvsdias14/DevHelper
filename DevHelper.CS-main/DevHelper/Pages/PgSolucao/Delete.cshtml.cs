@@ -56,7 +56,7 @@ namespace DevHelper.Razor.Pages.PgSolucao
                 await _context.SaveChangesAsync();
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("../Index");
         }
     }
 }

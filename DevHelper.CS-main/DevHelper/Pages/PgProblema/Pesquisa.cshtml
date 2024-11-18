@@ -1,0 +1,56 @@
+﻿@page 
+@model DevHelper.Razor.Pages.PgProblema.PesquisaModel
+@{
+    ViewData["Title"] = "Search Results";
+}
+
+<h2>Resultados da Pesquisa</h2>
+<hr />
+<div class="row">
+    <div class="col-md-12">
+        @if (Model.Problemas != null && Model.Problemas.Any())
+        {
+            <table class="table">
+                <thead>
+                    <tr>
+                        <th>Usuário</th>
+                        <th>Nome do Problema</th>
+                        <th>Descrição</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var item in Model.Problemas)
+                    {
+                        <tr>
+                            <td>
+                                <label class="clickable-label" data-url="@Url.Page("/PgCadUsuario/Details", new { Id = item.Usuario.Id })">
+                                    @Html.DisplayFor(modelItem => item.Usuario.Nome)
+                                </label>
+                            </td>
+                            <td>
+                                <label class="clickable-label" data-url="@Url.Page("/PgProblema/Details", new { Id = item.Id })">
+                                    @Html.DisplayFor(modelItem => item.Nome)
+                                </label>
+                            </td>
+                            <td>@Html.DisplayFor(modelItem => item.Descricao)</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Nenhum problema encontrado com este nome.</p>
+        }
+    </div>
+</div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.clickable-label').forEach(label => {
+            label.addEventListener('click', function () {
+                window.location.href = this.dataset.url;
+            });
+        });
+    </script>
+}

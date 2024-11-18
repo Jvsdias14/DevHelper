@@ -27,7 +27,11 @@ public partial class DBdevhelperContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
     {
-        if (optionsBuilder.IsConfigured) optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=devhelper;Trusted_connection=True;TrustServerCertificate=True", options => options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null));
+        if (optionsBuilder.IsConfigured)
+        {
+            optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=devhelper;Trusted_connection=True;TrustServerCertificate=True", options => options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null));
+        }
+            
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

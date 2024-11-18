@@ -7,12 +7,13 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using DevHelper.Data.Model;
 using Microsoft.AspNetCore.Identity; // Adicione esta linha
+using Microsoft.EntityFrameworkCore;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class CreateModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly DBdevhelperContext _context;
         private readonly IPasswordHasher<Usuario> _passwordHasher; // Adicione esta linha
 
         public CreateModel(DBdevhelperContext context, IPasswordHasher<Usuario> passwordHasher) // Atualize o construtor
@@ -34,6 +35,14 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
         {
             if (!ModelState.IsValid)
             {
+                return Page();
+            }
+
+            // Verificar se o e-mail já está cadastrado
+            var emailExists = await _context.Usuarios.AnyAsync(u => u.Email == Usuario.Email);
+            if (emailExists)
+            {
+                ModelState.AddModelError("Usuario.Email", "Este e-mail já está em uso.");
                 return Page();
             }
 

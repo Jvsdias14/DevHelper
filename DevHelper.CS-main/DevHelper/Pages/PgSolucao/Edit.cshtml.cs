@@ -67,7 +67,7 @@ namespace DevHelper.Razor.Pages.PgSolucao
                 }
             }
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("../Index");
         }
 
         private bool SolucaoExists(int id)
