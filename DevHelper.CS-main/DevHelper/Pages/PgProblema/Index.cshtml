@@ -6,110 +6,124 @@
 }
 
 <h1>Feed</h1>
-
-<table class="table">
-    <thead>
-    <tr>
-    <th>
-    Usuário
-    @* @Html.DisplayNameFor(model => model.Problema[0].Usuario) *@
-    </th>
-    <th>
-    Nome do problema
-    @* @Html.DisplayNameFor(model => model.Problema[0].Nome) *@
-    </th>
-    <th>
-    Descrição
-    @* @Html.DisplayNameFor(model => model.Problema[0].Descricao) *@
-    </th>
-    <th></th>
-    </tr>
-    </thead>
-    <tbody>
-        @foreach (var item in Model.Problema)
-        {
-            <tr>
-                <td>
-                    <label class="clickable-label" data-url="@Url.Page("/PgCadUsuario/Details", new { Id = item.Usuario.Id })">
-                        @Html.DisplayFor(modelItem => item.Usuario.Nome)
-                    </label>
-                </td>
-                <td>
-                    <label class="clickable-label" data-url="@Url.Page("/PgProblema/Details", new { Id = item.Id })">
-                        @Html.DisplayFor(modelItem => item.Nome)
-                    </label>
-                </td>
-                <td>
-                    @Html.DisplayFor(modelItem => item.Descricao)
-                </td>
-            </tr>
-        }
-    </tbody>
-</table>
+<hr />
+<div class="feed-container">
+    @foreach (var item in Model.Problema)
+    {
+        <div class="feed-item">
+            <div>
+                <strong>Usuário:</strong>
+                <a href="@Url.Page("/PgCadUsuario/Details", new { Id = item.Usuario.Id })" class="clickable-label">
+                    @Html.DisplayFor(modelItem => item.Usuario.Nome)
+                </a>
+            </div>
+            <div>
+                <strong>Nome do problema:</strong>
+                <a href="@Url.Page("/PgProblema/Details", new { Id = item.Id })" class="clickable-label">
+                    @Html.DisplayFor(modelItem => item.Nome)
+                </a>
+            </div>
+            <div>
+                <strong>Descrição:</strong>
+                <span>@Html.DisplayFor(modelItem => item.Descricao)</span>
+            </div>
+            @if (item.ArquivoProblemas != null && item.ArquivoProblemas.Any())
+            {
+                <div>
+                    <strong>Arquivos:</strong>
+                    <ul>
+                        @foreach (var arquivo in item.ArquivoProblemas)
+                        {
+                            <li>@arquivo.Nome</li>
+                        }
+                    </ul>
+                </div>
+            }
+            @if (item.Solucaos != null && item.Solucaos.Any())
+            {
+                <div>
+                    <strong>Soluções:</strong>
+                    <div class="card-deck">
+                        @foreach (var solucao in item.Solucaos)
+                        {
+                            <div class="card clickable-card" data-url="@Url.Page("/PgSolucao/Details", new { Id = solucao.Id })">
+                                <div class="card-body">
+                                    <p class="card-text">@solucao.Descricao</p>
+                                </div>
+                            </div>
+                        }
+                    </div>
+                </div>
+            }
+        </div>
+        <hr />
+    }
+</div>
 
 @section Scripts {
     <script>
-        document.querySelectorAll('.clickable-label').forEach(label => {
-            label.addEventListener('click', function () {
+        document.querySelectorAll('.clickable-card').forEach(card => {
+            card.addEventListener('click', function () {
                 window.location.href = this.dataset.url;
             });
         });
     </script>
 }
 
+<style>
+    .feed-container {
+        margin-top: 20px;
+    }
 
-@* @page
-@model DevHelper.Razor.Pages.PgProblema.IndexModel
+    .feed-item {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
 
-@{
-    ViewData["Title"] = "Feed";
-}
-
-<h1>Feed</h1>
-
-@* <p>
-    <a asp-page="Create">Create New</a>
-</p> *@
-@* <table class="table"> *@
-    @* <thead>
-    <tr>
-    <th>
-    @Html.DisplayNameFor(model => model.Problema[0].Nome)
-    </th>
-    <th>
-    @Html.DisplayNameFor(model => model.Problema[0].Descricao)
-    </th>
-    <th>
-    @Html.DisplayNameFor(model => model.Problema[0].Usuario)
-    </th>
-    <th></th>
-    </tr>
-    </thead> *@
-    @* <tbody>
-        @foreach (var item in Model.Problema)
-        {
-            <tr>
-                <td>
-                    <a asp-page="PgCadUsuario/Details" asp-route-id="@item.Usuario.Id">@Html.DisplayFor(modelItem => item.Usuario.Nome)</a>
-                </td>
-                <td>
-                    <a asp-page="PgProblema/Details" asp-route-id="@item.Id">@Html.DisplayFor(modelItem => item.Nome)</a>
-                </td>
- *@
-                @* <div class="container">
-            Teste tela <a asp-area="" asp-page="/PgProblema/Index">Problema</a>
-            </div> *@
-                @* <td>
-                    @Html.DisplayFor(modelItem => item.Descricao)
-                </td> *@
-
-                @* <td>
-            <a asp-page="./Edit" asp-route-id="@item.Id">Edit</a> |
-            <a asp-page="./Details" asp-route-id="@item.Id">Details</a> |
-            <a asp-page="./Delete" asp-route-id="@item.Id">Delete</a>
-            </td> *@
-         @*    </tr>
+        .feed-item div {
+            margin-bottom: 10px;
         }
-    </tbody>
-</table> *@
- 
+
+    .clickable-label, .clickable-card {
+        cursor: pointer;
+        color: #000;
+        text-decoration: none;
+    }
+
+        .clickable-label:hover, .clickable-card:hover {
+            text-decoration: underline;
+            color: #000; /* Manter a cor preta ao passar o mouse */
+        }
+
+    .card-deck {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 20px;
+    }
+
+    .card {
+        background-color: #fff;
+        border: 1px solid #ddd;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: calc(33.333% - 20px);
+        margin-bottom: 20px;
+        cursor: pointer;
+        transition: transform 0.2s;
+    }
+
+        .card:hover {
+            transform: scale(1.02);
+        }
+
+    .card-body {
+        padding: 15px;
+    }
+
+    .card-text {
+        margin: 0;
+        color: #000;
+        text-decoration: none;
+    }
+</style>

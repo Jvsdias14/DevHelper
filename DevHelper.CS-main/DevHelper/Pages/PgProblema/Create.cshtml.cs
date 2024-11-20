@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -6,7 +7,6 @@ using DevHelper.Data.Model;
 using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
-using Microsoft.AspNetCore.Authorization;
 using DevHelper.Data.Repositories;
 using DevHelper.Data.Interfaces;
 using DevHelper.Data.Interface;
@@ -21,7 +21,7 @@ namespace DevHelper.Razor.Pages.PgProblema
         private readonly iProblemaRepositoryAsync Repository;
         private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-
+        private const string UploadsFolderPath = @"C:\Users\jvsdi\Uploads";
 
         public CreateModel(iProblemaRepositoryAsync problemaRepositoryAsync, IHttpContextAccessor httpContextAccessor, ILogger<CreateModel> logger, iUsuarioRepositoryAsync usuariorepositoryasync)
         {
@@ -33,6 +33,9 @@ namespace DevHelper.Razor.Pages.PgProblema
 
         [BindProperty]
         public Problema Problema { get; set; } = default!;
+
+        [BindProperty]
+        public IFormFileCollection UploadedFiles { get; set; }
 
         public IActionResult OnGet()
         {
@@ -64,16 +67,13 @@ namespace DevHelper.Razor.Pages.PgProblema
             Problema.UsuarioId = int.Parse(userId);
             Problema.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(Problema.UsuarioId);
 
-            // Verificação manual da propriedade de navegação Usuario
             if (Problema.Usuario == null)
             {
                 ModelState.AddModelError("Problema.Usuario", "O usuário associado não pôde ser encontrado.");
             }
 
-            // Remover a propriedade de navegação do ModelState para evitar validação desnecessária
             ModelState.Remove("Problema.Usuario");
 
-            // Log para verificar o estado do problema antes da validação
             _logger.LogInformation($"Pre-Validation - Problema: {Problema.Nome}, Descricao: {Problema.Descricao}, UsuarioId: {Problema.UsuarioId}, Usuario: {Problema.Usuario?.Nome ?? "null"}");
 
             if (!ModelState.IsValid)
@@ -90,8 +90,37 @@ namespace DevHelper.Razor.Pages.PgProblema
             }
 
             await Repository.IncluirAsync(Problema);
-
             _logger.LogInformation("Problema cadastrado com sucesso");
+
+            // Salvar arquivos
+            foreach (var file in UploadedFiles)
+            {
+                if (file.Length > 0)
+                {
+                    var filePath = Path.Combine(UploadsFolderPath, file.FileName);
+
+                    // Verifica se a pasta de uploads existe, caso contrário, cria-a
+                    if (!Directory.Exists(UploadsFolderPath))
+                    {
+                        Directory.CreateDirectory(UploadsFolderPath);
+                    }
+
+                    using (var stream = new FileStream(filePath, FileMode.Create))
+                    {
+                        await file.CopyToAsync(stream);
+                    }
+
+                    var arquivoProblema = new ArquivoProblema
+                    {
+                        ProblemaId = Problema.Id,
+                        Nome = file.FileName,
+                        Referencia = filePath
+                    };
+
+                    await _context.ArquivoProblemas.AddAsync(arquivoProblema);
+                    await _context.SaveChangesAsync();
+                }
+            }
 
             return RedirectToPage("../Index");
         }

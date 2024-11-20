@@ -6,23 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interface;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class IndexModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
-
-        public IndexModel(DevHelper.Data.Model.DBdevhelperContext context)
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
+        public IndexModel(iUsuarioRepositoryAsync usuariorepositoryasync)
         {
-            _context = context;
+            UsuarioRepository = usuariorepositoryasync;
         }
 
         public IList<Usuario> Usuario { get;set; } = default!;
 
         public async Task OnGetAsync()
         {
-            Usuario = await _context.Usuarios.ToListAsync();
+            Usuario = await UsuarioRepository.SelecionTodosAsync();
         }
     }
 }

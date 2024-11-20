@@ -15,7 +15,7 @@ namespace DevHelper.Data.Interfaces
         Task<Problema> SelecionaPelaChaveAsync(int id);
         Task<List<Problema>> SelecionTodosAsync();
 
-        Task <List<Problema>> SelecionarProblemaUsuario();
+        Task <List<Problema>> SelecionarProblemaComTudo();
         Task <List<Problema>> Pesquisar(string query);
     }
 }

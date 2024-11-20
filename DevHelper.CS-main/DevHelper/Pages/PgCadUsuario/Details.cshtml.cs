@@ -10,17 +10,18 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Http;
 using DevHelper.Data.Model;
 using System.Security.Claims;
+using DevHelper.Data.Interface;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class DetailsModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
 
-        public DetailsModel(DBdevhelperContext context, IHttpContextAccessor httpContextAccessor)
+        public DetailsModel(iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpContextAccessor)
         {
-            _context = context;
+            UsuarioRepository = usuariorepositoryasync;
             _httpContextAccessor = httpContextAccessor;
         }
 
@@ -36,23 +37,18 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 return NotFound();
             }
 
-            var usuario = await _context.Usuarios
-                .Include(u => u.Problemas)
-                .Include(u => u.Solucaos)
-                .FirstOrDefaultAsync(m => m.Id == id);
+            var usuario = await UsuarioRepository.ObterUsuarioComProblemasESolucoesAsync(id.Value);
             if (usuario == null)
             {
                 return NotFound();
             }
-            else
-            {
-                Usuario = usuario;
-                Problemas = usuario.Problemas;
-                Solucoes = usuario.Solucaos;
 
-                var loggedInUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
-                IsCurrentUser = loggedInUserId == Usuario.Id.ToString();
-            }
+            Usuario = usuario;
+            Problemas = usuario.Problemas;
+            Solucoes = usuario.Solucaos;
+
+            var loggedInUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            IsCurrentUser = loggedInUserId == Usuario.Id.ToString();
 
             return Page();
         }
@@ -64,3 +60,4 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
         }
     }
 }
+

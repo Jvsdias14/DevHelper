@@ -6,11 +6,10 @@
 }
 
 <h1>Cadastrar Problema</h1>
-
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form method="post">
+    <div class="col-md-8">
+        <form method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <label asp-for="Problema.UsuarioId" class="control-label"></label>
@@ -24,22 +23,26 @@
             </div>
             <div class="form-group">
                 <label asp-for="Problema.Descricao" class="control-label"></label>
-                <input asp-for="Problema.Descricao" class="form-control" />
+                <textarea asp-for="Problema.Descricao" class="form-control" rows="10"></textarea>
                 <span asp-validation-for="Problema.Descricao" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
+                <input type="submit" value="Create" class="btn btn-custom" style="margin-top: 7.5px;" />
             </div>
-            <h2>Upload de Arquivo</h2>
-            <input type="file" id="fileInput" multiple>
-            <ul id="fileList"></ul>
         </form>
+    </div>
+    <div class="col-md-4">
+        <h2>Upload de Arquivo</h2>
+        <input type="file" id="fileInput" name="UploadedFiles" multiple class="form-control" />
+        <ul id="fileList" class="list-unstyled mt-2"></ul>
     </div>
 </div>
 
-<div>
-    <a asp-page="../Index">Back to List</a>
-</div>
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
 
 <script>
     document.getElementById('fileInput').addEventListener('change', function () {
@@ -55,8 +58,24 @@
         }
     });
 </script>
-@section Scripts {
-    @{
-        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+
+<style>
+    .btn.btn-custom {
+        background-color: #22ffb6;
+        color: #000;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
     }
-}
+
+        .btn.btn-custom:hover {
+            background-color: #1ccc9a;
+            color: #fff;
+        }
+
+    .text-custom {
+        color: #22ffb6;
+    }
+</style>

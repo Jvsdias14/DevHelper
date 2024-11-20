@@ -11,7 +11,7 @@ using DevHelper.Data.Interfaces;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
-    [Authorize] // Adicione esta linha para proteger a página
+    [Authorize]
     public class IndexModel : PageModel
     {
         private readonly DBdevhelperContext _context;
@@ -26,9 +26,7 @@ namespace DevHelper.Razor.Pages.PgProblema
 
         public async Task OnGetAsync()
         {
-            Problema = await Repository.SelecionarProblemaUsuario();
-
-            //return;
+            Problema = await Repository.SelecionarProblemaComTudo();
         }
     }
 }

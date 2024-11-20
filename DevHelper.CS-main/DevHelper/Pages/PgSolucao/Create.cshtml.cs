@@ -8,18 +8,28 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using DevHelper.Data.Model;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using DevHelper.Data.Interface;
+using System.Security.Claims;
+using DevHelper.Data.Interfaces;
+using Microsoft.AspNetCore.Http;
 
 namespace DevHelper.Razor.Pages.PgSolucao
 {
     public class CreateModel : PageModel
     {
-        private readonly DBdevhelperContext _context;
+        private readonly iSolucaoRepositoryAsync SolucaoRepository;
         private readonly ILogger<CreateModel> _logger;
+        private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly iProblemaRepositoryAsync ProblemaRepository;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public CreateModel(DBdevhelperContext context, ILogger<CreateModel> logger)
+        public CreateModel(iSolucaoRepositoryAsync SolucaoRepositoryAsync, ILogger<CreateModel> logger, IHttpContextAccessor httpContextAccessor, iProblemaRepositoryAsync problemaRepository, iUsuarioRepositoryAsync usuarioRepository)
         {
-            _context = context;
+            SolucaoRepository = SolucaoRepositoryAsync;
             _logger = logger;
+            _httpContextAccessor = httpContextAccessor;
+            ProblemaRepository = problemaRepository;
+            UsuarioRepository = usuarioRepository;
         }
 
         [BindProperty]
@@ -29,64 +39,57 @@ namespace DevHelper.Razor.Pages.PgSolucao
 
         public Usuario Usuario { get; set; } = default!;
 
-        public async Task<IActionResult> OnGetAsync(int? problemaId, int? usuarioId)
+        public async Task<IActionResult> OnGetAsync(int? problemaId)
         {
-            // Adicionando logs para depuração
-            _logger.LogInformation("Iniciando OnGetAsync");
-            _logger.LogInformation($"problemaId: {problemaId}, usuarioId: {usuarioId}");
-
-            if (problemaId == null || usuarioId == null)
+            if (problemaId == null)
             {
-                _logger.LogWarning("ProblemaId ou UsuarioId nulos. Redirecionando para Index.");
+                return NotFound();
+            }
+
+            var loggedInUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            if (loggedInUserId == null)
+            {
+                _logger.LogWarning("Usuário não autenticado. Redirecionando para Index.");
                 return RedirectToPage("../Index");
             }
 
-            Problema = await _context.Problemas.FindAsync(problemaId.Value);
-            Usuario = await _context.Usuarios.FindAsync(usuarioId.Value);
-
-            if (Problema == null || Usuario == null)
+            Problema = await ProblemaRepository.SelecionaPelaChaveAsync(problemaId.Value);
+            if (Problema == null)
             {
-                _logger.LogWarning("Problema ou Usuario não encontrado. Redirecionando para Index.");
+                _logger.LogWarning("Problema não encontrado. Redirecionando para Index.");
+                return RedirectToPage("../Index");
+            }
+
+            Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(int.Parse(loggedInUserId));
+            if (Usuario == null)
+            {
+                _logger.LogWarning("Usuário não encontrado. Redirecionando para Index.");
                 return RedirectToPage("../Index");
             }
 
             Solucao = new Solucao
             {
-                ProblemaId = Problema.Id,
-                UsuarioId = Usuario.Id
+                ProblemaId = problemaId.Value,
+                UsuarioId = int.Parse(loggedInUserId),
+                Usuario = Usuario,
+                Problema = Problema
             };
-
-            ViewData["ProblemaId"] = new SelectList(_context.Problemas, "Id", "Descricao", Solucao.ProblemaId);
-            ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nome", Solucao.UsuarioId);
 
             return Page();
         }
 
         public async Task<IActionResult> OnPostAsync()
         {
-            // Atribuir os objetos Problema e Usuario antes da validação do ModelState
-            Solucao.Problema = await _context.Problemas.FindAsync(Solucao.ProblemaId);
-            Solucao.Usuario = await _context.Usuarios.FindAsync(Solucao.UsuarioId);
+            ModelState.Remove("Solucao.Usuario");
+            ModelState.Remove("Solucao.Problema");
 
-            if (Solucao.Problema == null)
-            {
-                ModelState.AddModelError("Solucao.ProblemaId", "Problema inválido.");
-            }
-
-            if (Solucao.Usuario == null)
-            {
-                ModelState.AddModelError("Solucao.UsuarioId", "Usuário inválido.");
-            }
 
             if (!ModelState.IsValid)
             {
-                ViewData["ProblemaId"] = new SelectList(_context.Problemas, "Id", "Descricao", Solucao.ProblemaId);
-                ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Nome", Solucao.UsuarioId);
                 return Page();
             }
 
-            _context.Solucoes.Add(Solucao);
-            await _context.SaveChangesAsync();
+            await SolucaoRepository.IncluirAsync(Solucao);
 
             return RedirectToPage("../Index");
         }

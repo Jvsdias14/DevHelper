@@ -2,41 +2,48 @@
 @model DevHelper.Razor.Pages.PgSolucao.CreateModel
 
 @{
-    ViewData["Title"] = "Create";
+    ViewData["Title"] = "Cadastrar Solução";
 }
 
 <h2>Cadastrar Solução</h2>
 <hr />
 <div class="row">
-    <div class="col-md-4">
-        <form method="post">
+    <div class="col-md-8">
+        <form method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label class="control-label">Problema</label>
-                <select asp-for="Solucao.Problema" class ="form-control" asp-items="ViewBag.ProblemaId"></select>
+                <h3>Problema:</h3>
+                <label class="control-label">@Model.Problema?.Nome ?? "Problema não encontrado"</label>
             </div>
-            @* <div class="form-group">
-                <label asp-for="Solucao.UsuarioId" class="control-label"></label>
-                <select asp-for="Solucao.UsuarioId" class ="form-control" asp-items="ViewBag.UsuarioId"></select>
-            </div> *@
             <div class="form-group">
-                <label class="control-label">Descrição</label>
-                <input asp-for="Solucao.Descricao" class="form-control" />
+                <h3>Descrição do problema:</h3>
+                <label class="control-label">@Model.Problema?.Descricao ?? "Descrição não encontrada"</label>
+            </div>
+            <input type="hidden" asp-for="Solucao.ProblemaId" />
+            <input type="hidden" asp-for="Solucao.UsuarioId" />
+            <hr />
+            <div class="form-group">
+                <label class="control-label">Minha Solução</label>
+                <textarea asp-for="Solucao.Descricao" class="form-control mb-2" rows="10"></textarea>
                 <span asp-validation-for="Solucao.Descricao" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Cadastrar" class="btn btn-primary" />
+                <input type="submit" value="Cadastrar" class="btn btn-custom" style="margin-top: 7.5px;" />
             </div>
-            <h2>Upload de Arquivo</h2>
-            <input type="file" id="fileInput" multiple>
-            <ul id="fileList"></ul>
         </form>
+    </div>
+    <div class="col-md-4">
+        <h3>Upload de Arquivo</h3>
+        <input type="file" id="fileInput" name="UploadedFiles" multiple class="form-control">
+        <ul id="fileList" class="list-unstyled mt-2"></ul>
     </div>
 </div>
 
-@* <div>
-    <a asp-page="Index">Back to List</a>
-</div> *@
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}
 
 <script>
     document.getElementById('fileInput').addEventListener('change', function () {
@@ -53,6 +60,25 @@
     });
 </script>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
-}
+<style>
+    .btn.btn-custom {
+        background-color: #22ffb6;
+        color: #000;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        margin: 5px;
+    }
+
+        .btn.btn-custom:hover {
+            background-color: #1ccc9a;
+            color: #fff;
+        }
+
+    .text-custom {
+        color: #22ffb6;
+    }
+</style>

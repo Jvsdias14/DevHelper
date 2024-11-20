@@ -81,14 +81,17 @@ namespace DevHelper.Data.Repositories
                 .ToListAsync();
         }
 
-        public async Task<List<Problema>> SelecionarProblemaUsuario()
+        public async Task<List<Problema>> SelecionarProblemaComTudo()
         {
             var problemas = await SelecionTodosAsync();
             foreach (var problema in problemas)
             {
                 problema.Usuario = await db.Usuarios.FindAsync(problema.UsuarioId);
+                problema.Solucaos = await db.Solucoes.Where(s => s.ProblemaId == problema.Id).ToListAsync();
+                problema.ArquivoProblemas = await db.ArquivoProblemas.Where(a => a.ProblemaId == problema.Id).ToListAsync();
             }
             return problemas;
         }
+
     }
- }
+}

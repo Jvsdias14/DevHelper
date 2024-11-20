@@ -27,6 +27,9 @@ builder.Services.AddScoped<iProblemaRepositoryAsync, ProblemaRepository>();
 builder.Services.AddScoped<iUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<iUsuarioRepositoryAsync, UsuarioRepository>();
 
+builder.Services.AddScoped<iSolucaoRepository, SolucaoRepository>();
+builder.Services.AddScoped<iSolucaoRepositoryAsync, SolucaoRepository>();
+
 // Configuração de autenticação com cookies
 builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationScheme)
     .AddCookie(options =>

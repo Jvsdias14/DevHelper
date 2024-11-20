@@ -4,19 +4,19 @@ using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interface;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class EditModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public EditModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public EditModel(iUsuarioRepositoryAsync usuariorepositoryasync)
         {
-            _context = context;
+            UsuarioRepository = usuariorepositoryasync;
         }
 
         [BindProperty]
@@ -29,7 +29,7 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 return NotFound();
             }
 
-            var usuario =  await _context.Usuarios.FirstOrDefaultAsync(m => m.Id == id);
+            var usuario = await UsuarioRepository.SelecionaPelaChaveAsync(id.Value);
             if (usuario == null)
             {
                 return NotFound();
@@ -38,8 +38,6 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
         public async Task<IActionResult> OnPostAsync()
         {
             if (!ModelState.IsValid)
@@ -47,15 +45,13 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 return Page();
             }
 
-            _context.Attach(Usuario).State = EntityState.Modified;
-
             try
             {
-                await _context.SaveChangesAsync();
+                await UsuarioRepository.AlterarAsync(Usuario);
             }
             catch (DbUpdateConcurrencyException)
             {
-                if (!UsuarioExists(Usuario.Id))
+                if (!await UsuarioExistsAsync(Usuario.Id))
                 {
                     return NotFound();
                 }
@@ -68,9 +64,9 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             return RedirectToPage("../Index");
         }
 
-        private bool UsuarioExists(int id)
+        private async Task<bool> UsuarioExistsAsync(int id)
         {
-            return _context.Usuarios.Any(e => e.Id == id);
+            return await UsuarioRepository.SelecionaPelaChaveAsync(id) != null;
         }
     }
 }

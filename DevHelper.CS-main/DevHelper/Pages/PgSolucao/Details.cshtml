@@ -2,36 +2,71 @@
 @model DevHelper.Razor.Pages.PgSolucao.DetailsModel
 
 @{
-    ViewData["Title"] = "Details";
+    ViewData["Title"] = "Detalhes da Solução";
 }
 
-<h1>Details</h1>
-
+<h1>Detalhes da Solução</h1>
+<hr />
 <div>
-    <h4>Solucao</h4>
+    <h4>@Html.DisplayFor(model => model.Problema.Nome)</h4>
     <hr />
     <dl class="row">
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Solucao.Descricao)
+            Descrição
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Solucao.Descricao)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Solucao.Problema)
+            Problema
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Problema.Nome)
         </dd>
         <dt class="col-sm-2">
-            @Html.DisplayNameFor(model => model.Solucao.Usuario)
+            Usuário
         </dt>
         <dd class="col-sm-10">
             @Html.DisplayFor(model => model.Usuario.Nome)
         </dd>
     </dl>
 </div>
-<div>
-    <a asp-page="./Edit" asp-route-id="@Model.Solucao.Id">Edit</a> |
-    <a asp-page="./Index">Back to List</a>
+
+<div class="d-flex justify-content-center align-items-center mt-4">
+    <a asp-page="/PgSolucao/Edit" asp-route-id="@Model.Solucao.Id" class="btn btn-custom">Editar</a>
 </div>
+
+<style>
+    .btn.btn-custom {
+        background-color: #22ffb6;
+        color: #000;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        margin: 5px;
+    }
+
+        .btn.btn-custom:hover {
+            background-color: #1ccc9a;
+            color: #fff;
+        }
+
+    .text-custom {
+        color: #22ffb6;
+    }
+
+    .d-flex {
+        display: flex;
+    }
+
+    .justify-content-between {
+        justify-content: space-between;
+    }
+
+    .align-items-center {
+        align-items: center;
+    }
+</style>

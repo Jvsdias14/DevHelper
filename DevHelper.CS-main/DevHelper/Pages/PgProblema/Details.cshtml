@@ -1,25 +1,90 @@
 ﻿@page
 @model DevHelper.Razor.Pages.PgProblema.DetailsModel
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
-@* @{
-    ViewData["Title"] = "Details";
-} *@
-
+@{
+    var userId = HttpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+}
 
 <h1>@Html.DisplayFor(model => model.Problema.Nome)</h1>
 
 <div>
     <h4>@Html.DisplayFor(model => model.Usuario.Nome)</h4>
     <hr />
-    
+
     <h5 class="col-sm-2">
         @Html.DisplayNameFor(model => model.Problema.Descricao)
     </h5>
     <dd class="col-sm-10">
         @Html.DisplayFor(model => model.Problema.Descricao)
     </dd>
-        
 </div>
-<div>
-    <a asp-page="/PgSolucao/Create" asp-route-problemaId="@Model.Problema.Id" asp-route-usuarioId=@Model.Problema.Usuario.Id>Criar Solução</a>
+
+<div class="d-flex justify-content-between align-items-center">
+    @if (userId == Model.Problema.UsuarioId.ToString())
+    {
+        <a asp-page="/PgProblema/Delete" asp-route-id="@Model.Problema.Id" class="btn btn-custom">Deletar Problema</a>
+    }
+    else
+    {
+        <a asp-page="/PgSolucao/Create" asp-route-problemaId="@Model.Problema.Id" class="btn btn-custom">Criar Solução</a>
+    }
 </div>
+
+@section Scripts {
+    <script>
+        document.querySelectorAll('.clickable-label').forEach(label => {
+            label.addEventListener('click', function () {
+                window.location.href = this.dataset.url;
+            });
+        });
+    </script>
+}
+
+<style>
+    .btn.btn-custom {
+        background-color: #22ffb6;
+        color: #000;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+    }
+
+        .btn.btn-custom:hover {
+            background-color: #1ccc9a;
+            color: #fff;
+        }
+
+    .text-custom {
+        color: #22ffb6;
+    }
+
+    .feed-container {
+        margin-top: 20px;
+    }
+
+    .feed-item {
+        margin-bottom: 20px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid #ddd;
+    }
+
+        .feed-item div {
+            margin-bottom: 10px;
+        }
+
+    .clickable-label {
+        cursor: pointer;
+        color: #000;
+        text-decoration: none;
+    }
+
+        .clickable-label:hover {
+            text-decoration: underline;
+        }
+</style>

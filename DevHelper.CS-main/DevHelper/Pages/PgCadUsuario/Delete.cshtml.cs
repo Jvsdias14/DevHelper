@@ -14,13 +14,11 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class DeleteModel : PageModel
     {
-        private readonly DBdevhelperContext _context;
         private readonly iUsuarioRepositoryAsync UsuarioRepository;
         private readonly IHttpContextAccessor _httpcontextAccessor;
 
-        public DeleteModel(DBdevhelperContext context, iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpcontextAccessor)
+        public DeleteModel( iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpcontextAccessor)
         {
-            _context = context;
             UsuarioRepository = usuariorepositoryasync;
             _httpcontextAccessor = httpcontextAccessor;
         }

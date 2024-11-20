@@ -15,5 +15,7 @@ namespace DevHelper.Data.Interface
         Task<Usuario> SelecionaPelaChaveAsync(int id);
         Task<List<Usuario>> SelecionTodosAsync();
         Task <bool> VerificaEmail(Usuario usuario);
+
+        Task<Usuario> ObterUsuarioComProblemasESolucoesAsync(int id);
     }
 }
