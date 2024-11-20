@@ -7,16 +7,20 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interface;
+using DevHelper.Data.Interfaces;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
     public class EditModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly DBdevhelperContext _context;
+        private readonly iProblemaRepositoryAsync Repository;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public EditModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public EditModel(iProblemaRepositoryAsync problemaRepositoryAsync)
         {
-            _context = context;
+            Repository = problemaRepositoryAsync;
         }
 
         [BindProperty]
@@ -29,7 +33,7 @@ namespace DevHelper.Razor.Pages.PgProblema
                 return NotFound();
             }
 
-            var problema =  await _context.Problemas.FirstOrDefaultAsync(m => m.Id == id);
+            var problema =  await Repository.SelecionaPelaChaveAsync(id.Value);
             if (problema == null)
             {
                 return NotFound();
@@ -48,30 +52,30 @@ namespace DevHelper.Razor.Pages.PgProblema
                 return Page();
             }
 
-            _context.Attach(Problema).State = EntityState.Modified;
+            await Repository.AlterarAsync(Problema);
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!ProblemaExists(Problema.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            //try
+            //{
+            //    await _context.SaveChangesAsync();
+            //}
+            //catch (DbUpdateConcurrencyException)
+            //{
+            //    if (!ProblemaExists(Problema.Id))
+            //    {
+            //        return NotFound();
+            //    }
+            //    else
+            //    {
+            //        throw;
+            //    }
+            //}
 
-            return RedirectToPage("./Index");
+            return RedirectToPage("../Index");
         }
 
-        private bool ProblemaExists(int id)
-        {
-            return _context.Problemas.Any(e => e.Id == id);
-        }
+        //        private bool ProblemaExists(int id)
+        //        {
+        //            return _context.Problemas.Any(e => e.Id == id);
+        //        }
     }
 }

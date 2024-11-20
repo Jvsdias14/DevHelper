@@ -8,6 +8,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using DevHelper.Data.Model;
 using Microsoft.AspNetCore.Identity; // Adicione esta linha
 using Microsoft.EntityFrameworkCore;
+using DevHelper.Data.Interface;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
@@ -15,10 +16,11 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
     {
         private readonly DBdevhelperContext _context;
         private readonly IPasswordHasher<Usuario> _passwordHasher; // Adicione esta linha
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public CreateModel(DBdevhelperContext context, IPasswordHasher<Usuario> passwordHasher) // Atualize o construtor
+        public CreateModel(iUsuarioRepositoryAsync usuariorepositoryasync, IPasswordHasher<Usuario> passwordHasher) // Atualize o construtor
         {
-            _context = context;
+            UsuarioRepository = usuariorepositoryasync;
             _passwordHasher = passwordHasher; // Inicialize o passwordHasher
         }
 
@@ -39,7 +41,7 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             }
 
             // Verificar se o e-mail já está cadastrado
-            var emailExists = await _context.Usuarios.AnyAsync(u => u.Email == Usuario.Email);
+            var emailExists = await UsuarioRepository.VerificaEmail(Usuario);
             if (emailExists)
             {
                 ModelState.AddModelError("Usuario.Email", "Este e-mail já está em uso.");
@@ -49,8 +51,7 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             // Criptografar a senha
             Usuario.Senha = _passwordHasher.HashPassword(Usuario, Usuario.Senha);
 
-            _context.Usuarios.Add(Usuario);
-            await _context.SaveChangesAsync();
+            await UsuarioRepository.IncluirAsync(Usuario);
 
             return RedirectToPage("../Index");
         }

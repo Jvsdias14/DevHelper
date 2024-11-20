@@ -14,5 +14,6 @@ namespace DevHelper.Data.Interface
         Task ExcluirAsync(Usuario usuario);
         Task<Usuario> SelecionaPelaChaveAsync(int id);
         Task<List<Usuario>> SelecionTodosAsync();
+        Task <bool> VerificaEmail(Usuario usuario);
     }
 }

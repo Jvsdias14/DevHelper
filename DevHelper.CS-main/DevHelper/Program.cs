@@ -6,6 +6,8 @@ using DevHelper.Data.Repositories;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Authentication;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -42,6 +44,14 @@ builder.Services.AddSingleton<IPasswordHasher<Usuario>, PasswordHasher<Usuario>>
 // Registrar o IHttpContextAccessor
 builder.Services.AddSingleton<IHttpContextAccessor, HttpContextAccessor>();
 
+// Adicionar configurações de sessão
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(30);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
+
 var app = builder.Build();
 
 // Configuração do pipeline de requisições
@@ -55,9 +65,31 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 app.UseRouting();
 
+// Usar sessão antes de autenticação e autorização
+app.UseSession();
+
 // Autenticação e autorização
 app.UseAuthentication(); // Deve ser colocado antes do UseAuthorization()
 app.UseAuthorization();
+
+app.Use(async (context, next) =>
+{
+    if (context.User.Identity.IsAuthenticated)
+    {
+        var userId = context.User.FindFirstValue(ClaimTypes.NameIdentifier);
+        if (userId != null)
+        {
+            var userRepository = context.RequestServices.GetRequiredService<iUsuarioRepositoryAsync>();
+            var user = await userRepository.SelecionaPelaChaveAsync(int.Parse(userId));
+            if (user == null)
+            {
+                await context.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
+                context.Session.Clear();
+            }
+        }
+    }
+    await next.Invoke();
+});
 
 app.MapRazorPages();
 

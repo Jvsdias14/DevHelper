@@ -71,5 +71,10 @@ namespace DevHelper.Data.Repository
         {
             return await db.Usuarios.OrderBy(p => p.Nome).ToListAsync();
         }
+
+        public async Task<bool> VerificaEmail(Usuario usuario)
+        {
+            return await db.Usuarios.AnyAsync(u => u.Email == usuario.Email);
+        }
     }
 }

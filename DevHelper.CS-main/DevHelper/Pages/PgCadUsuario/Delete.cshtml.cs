@@ -6,16 +6,23 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interface;
+using System.Security.Claims;
+using Microsoft.AspNetCore.Http;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
     public class DeleteModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly DBdevhelperContext _context;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
+        private readonly IHttpContextAccessor _httpcontextAccessor;
 
-        public DeleteModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public DeleteModel(DBdevhelperContext context, iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpcontextAccessor)
         {
             _context = context;
+            UsuarioRepository = usuariorepositoryasync;
+            _httpcontextAccessor = httpcontextAccessor;
         }
 
         [BindProperty]
@@ -28,16 +35,20 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 return NotFound();
             }
 
-            var usuario = await _context.Usuarios.FirstOrDefaultAsync(m => m.Id == id);
+            var usuario = await UsuarioRepository.SelecionaPelaChaveAsync(id.Value);
+            var userId = _httpcontextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
 
             if (usuario == null)
             {
                 return NotFound();
             }
-            else
+
+            if (userId == null || usuario.Id != int.Parse(userId))
             {
-                Usuario = usuario;
+                return Forbid();
             }
+
+            Usuario = usuario;
             return Page();
         }
 
@@ -48,15 +59,38 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
                 return NotFound();
             }
 
-            var usuario = await _context.Usuarios.FindAsync(id);
-            if (usuario != null)
+            var usuario = await UsuarioRepository.SelecionaPelaChaveAsync(id.Value);
+            var userId = _httpcontextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+
+            if (usuario == null)
             {
-                Usuario = usuario;
-                _context.Usuarios.Remove(Usuario);
-                await _context.SaveChangesAsync();
+                return NotFound();
             }
 
+            if (userId == null || usuario.Id != int.Parse(userId))
+            {
+                return Forbid();
+            }
+
+            await UsuarioRepository.ExcluirAsync(usuario);
+
+            // Limpar sessões e cookies após a exclusão
+            LimparDadosUsuario();
+
             return RedirectToPage("../Index");
+        }
+
+        private void LimparDadosUsuario()
+        {
+            // Limpar cookies
+            var cookies = _httpcontextAccessor.HttpContext.Request.Cookies.Keys.ToList();
+            foreach (var cookie in cookies)
+            {
+                _httpcontextAccessor.HttpContext.Response.Cookies.Delete(cookie);
+            }
+
+            // Limpar sessões
+            _httpcontextAccessor.HttpContext.Session.Clear();
         }
     }
 }

@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Http;
 using System.Security.Claims;
 using Microsoft.Extensions.Logging;
 using Microsoft.AspNetCore.Authorization;
+using DevHelper.Data.Repositories;
+using DevHelper.Data.Interfaces;
+using DevHelper.Data.Interface;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
@@ -15,10 +18,15 @@ namespace DevHelper.Razor.Pages.PgProblema
         private readonly DBdevhelperContext _context;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateModel> _logger;
+        private readonly iProblemaRepositoryAsync Repository;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public CreateModel(DBdevhelperContext context, IHttpContextAccessor httpContextAccessor, ILogger<CreateModel> logger)
+
+
+        public CreateModel(iProblemaRepositoryAsync problemaRepositoryAsync, IHttpContextAccessor httpContextAccessor, ILogger<CreateModel> logger, iUsuarioRepositoryAsync usuariorepositoryasync)
         {
-            _context = context;
+            Repository = problemaRepositoryAsync;
+            UsuarioRepository = usuariorepositoryasync;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
         }
@@ -54,7 +62,7 @@ namespace DevHelper.Razor.Pages.PgProblema
             }
 
             Problema.UsuarioId = int.Parse(userId);
-            Problema.Usuario = await _context.Usuarios.FindAsync(Problema.UsuarioId);
+            Problema.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(Problema.UsuarioId);
 
             // Verificação manual da propriedade de navegação Usuario
             if (Problema.Usuario == null)
@@ -81,8 +89,7 @@ namespace DevHelper.Razor.Pages.PgProblema
                 return Page();
             }
 
-            _context.Problemas.Add(Problema);
-            await _context.SaveChangesAsync();
+            await Repository.IncluirAsync(Problema);
 
             _logger.LogInformation("Problema cadastrado com sucesso");
 

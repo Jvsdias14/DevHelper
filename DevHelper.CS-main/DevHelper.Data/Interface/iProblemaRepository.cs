@@ -14,5 +14,6 @@ namespace DevHelper.Data.Interfaces
         void Excluir(Problema oProblema);
         Problema SelecionaPelaChave(int id);
         List<Problema> SelecionarTodos();
+        
     }
 }

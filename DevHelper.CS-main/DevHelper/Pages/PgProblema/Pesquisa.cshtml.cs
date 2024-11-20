@@ -5,16 +5,21 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interfaces;
+using DevHelper.Data.Interface;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
     public class PesquisaModel : PageModel
     {
         private readonly DBdevhelperContext _context;
+        private readonly iProblemaRepositoryAsync Repository;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public PesquisaModel(DBdevhelperContext context)
+        public PesquisaModel(iProblemaRepositoryAsync problemaRepositoryAsync, iUsuarioRepositoryAsync usuariorepositoryasync)
         {
-            _context = context;
+            Repository = problemaRepositoryAsync;
+            UsuarioRepository = usuariorepositoryasync;
         }
 
         public IList<Problema> Problemas { get; set; }
@@ -30,16 +35,13 @@ namespace DevHelper.Razor.Pages.PgProblema
 
             ViewData["IsEmpty"] = false;
 
-            var problemas = await _context.Problemas
-                .Where(p => p.Nome.Contains(query))
-                .ToListAsync();
+            Problemas = await Repository.Pesquisar(query);
 
-            foreach (var problema in problemas)
+            // Carregar os usuários associados aos problemas
+            foreach (var problema in Problemas)
             {
-                problema.Usuario = await _context.Usuarios.FindAsync(problema.UsuarioId);
+                problema.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(problema.UsuarioId);
             }
-
-            Problemas = problemas;
 
             return Page();
         }

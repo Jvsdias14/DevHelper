@@ -6,16 +6,22 @@ using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interfaces;
+using DevHelper.Data.Interface;
+using DevHelper.Data.Repository;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
     public class DetailsModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly DBdevhelperContext _context;
+        private readonly iProblemaRepositoryAsync Repository; 
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public DetailsModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public DetailsModel(iProblemaRepositoryAsync problemaRepositoryAsync, iUsuarioRepositoryAsync usuariorepositoryasync)
         {
-            _context = context;
+            Repository = problemaRepositoryAsync;
+            UsuarioRepository = usuariorepositoryasync;
         }
 
         public Problema Problema { get; set; } = default!;
@@ -29,8 +35,8 @@ namespace DevHelper.Razor.Pages.PgProblema
                 return NotFound();
             }
 
-            var problema = await _context.Problemas.FirstOrDefaultAsync(m => m.Id == id);
-            var usuario = await _context.Usuarios.FirstOrDefaultAsync(m => m.Id == problema.UsuarioId);
+            var problema = await Repository.SelecionaPelaChaveAsync(id.Value);
+            var usuario = await UsuarioRepository.SelecionaPelaChaveAsync(problema.UsuarioId);
 
 
             if (problema == null)

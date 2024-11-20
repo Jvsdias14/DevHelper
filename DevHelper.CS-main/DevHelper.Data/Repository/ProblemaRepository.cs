@@ -6,6 +6,7 @@ using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DevHelper.Data.Repositories
 {
@@ -71,6 +72,23 @@ namespace DevHelper.Data.Repositories
         public async Task<List<Problema>> SelecionTodosAsync()
         {
             return await db.Problemas.OrderBy(p => p.Nome).ToListAsync();
+        }
+        public async Task<List<Problema>> Pesquisar(string query)
+        {
+             
+            return await db.Problemas
+                .Where(p => p.Nome.Contains(query))
+                .ToListAsync();
+        }
+
+        public async Task<List<Problema>> SelecionarProblemaUsuario()
+        {
+            var problemas = await SelecionTodosAsync();
+            foreach (var problema in problemas)
+            {
+                problema.Usuario = await db.Usuarios.FindAsync(problema.UsuarioId);
+            }
+            return problemas;
         }
     }
  }

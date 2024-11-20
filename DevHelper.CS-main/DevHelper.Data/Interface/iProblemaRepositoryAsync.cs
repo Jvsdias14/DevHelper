@@ -14,5 +14,8 @@ namespace DevHelper.Data.Interfaces
         Task ExcluirAsync(Problema oProblema);
         Task<Problema> SelecionaPelaChaveAsync(int id);
         Task<List<Problema>> SelecionTodosAsync();
+
+        Task <List<Problema>> SelecionarProblemaUsuario();
+        Task <List<Problema>> Pesquisar(string query);
     }
 }
