@@ -44,7 +44,7 @@ public partial class DBdevhelperContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Nome)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.ProblemaId).HasColumnName("Problema_id");
             entity.Property(e => e.Referencia)
@@ -65,7 +65,7 @@ public partial class DBdevhelperContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Nome)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.Referencia)
                 .HasMaxLength(100)
@@ -86,10 +86,10 @@ public partial class DBdevhelperContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Descricao)
-                .HasMaxLength(1000)
+                .HasMaxLength(1500)
                 .IsUnicode(false);
             entity.Property(e => e.Nome)
-                .HasMaxLength(50)
+                .HasMaxLength(150)
                 .IsUnicode(false);
             entity.Property(e => e.UsuarioId).HasColumnName("Usuario_id");
 
@@ -107,7 +107,7 @@ public partial class DBdevhelperContext : DbContext
 
             entity.Property(e => e.Id).HasColumnName("id");
             entity.Property(e => e.Descricao)
-                .HasMaxLength(1000)
+                .HasMaxLength(1500)
                 .IsUnicode(false);
             entity.Property(e => e.ProblemaId).HasColumnName("Problema_id");
             entity.Property(e => e.UsuarioId).HasColumnName("Usuario_id");
@@ -134,10 +134,10 @@ public partial class DBdevhelperContext : DbContext
                 .HasMaxLength(1000)
                 .IsUnicode(false);
             entity.Property(e => e.Email)
-                .HasMaxLength(100)
+                .HasMaxLength(150)
                 .IsUnicode(false);
             entity.Property(e => e.Nome)
-                .HasMaxLength(50)
+                .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.Senha)
                 .HasMaxLength(200)

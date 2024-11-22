@@ -11,6 +11,8 @@ using Microsoft.AspNetCore.Http;
 using DevHelper.Data.Model;
 using System.Security.Claims;
 using DevHelper.Data.Interface;
+using DevHelper.Data.Repository;
+using DevHelper.Data.Interfaces;
 
 namespace DevHelper.Razor.Pages.PgCadUsuario
 {
@@ -18,14 +20,19 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
     {
         private readonly iUsuarioRepositoryAsync UsuarioRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
+        private readonly iProblemaRepositoryAsync ProblemaRepository;
+        private readonly iSolucaoRepositoryAsync SolucaoRepository;
 
-        public DetailsModel(iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpContextAccessor)
+        public DetailsModel(iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpContextAccessor, iSolucaoRepositoryAsync solucaoRepository,iProblemaRepositoryAsync problemarepository)
         {
             UsuarioRepository = usuariorepositoryasync;
             _httpContextAccessor = httpContextAccessor;
+            SolucaoRepository = solucaoRepository;
+            ProblemaRepository = problemarepository;
         }
 
         public Usuario Usuario { get; set; } = default!;
+
         public bool IsCurrentUser { get; set; }
         public ICollection<Problema> Problemas { get; set; } = default!;
         public ICollection<Solucao> Solucoes { get; set; } = default!;
@@ -46,6 +53,11 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             Usuario = usuario;
             Problemas = usuario.Problemas;
             Solucoes = usuario.Solucaos;
+
+            foreach (var solucao in Solucoes)
+            {
+                solucao.Problema = await ProblemaRepository.SelecionaPelaChaveAsync(solucao.ProblemaId);
+            }
 
             var loggedInUserId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             IsCurrentUser = loggedInUserId == Usuario.Id.ToString();
