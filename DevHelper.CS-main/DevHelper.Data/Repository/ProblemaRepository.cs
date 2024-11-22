@@ -93,5 +93,14 @@ namespace DevHelper.Data.Repositories
             return problemas;
         }
 
+        public async Task<List<Solucao>> BuscarSolucoesRestantesAsync(int problemaId, int numeroDeSolucoesCarregadas)
+        {
+            return await db.Solucoes
+                          .Where(s => s.ProblemaId == problemaId)
+                          .Skip(numeroDeSolucoesCarregadas)
+                          .ToListAsync();
+        }
+
+
     }
 }

@@ -16,6 +16,7 @@ namespace DevHelper.Data.Repository
         {
             db = context;
         }
+
         public void Alterar(Usuario usuario)
         {
             db.Entry(usuario).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
@@ -52,7 +53,6 @@ namespace DevHelper.Data.Repository
             await db.SaveChangesAsync();
         }
 
-
         public Usuario SelecionaPelaChave(int id)
         {
             return db.Usuarios.Find(id);
@@ -77,12 +77,13 @@ namespace DevHelper.Data.Repository
         {
             return await db.Usuarios.AnyAsync(u => u.Email == usuario.Email);
         }
-        public async Task<Usuario> ObterUsuarioComProblemasESolucoesAsync(int id) 
-        { 
+
+        public async Task<Usuario> ObterUsuarioComProblemasESolucoesAsync(int id)
+        {
             return await db.Usuarios
                 .Include(u => u.Problemas)
                 .Include(u => u.Solucaos)
-                .FirstOrDefaultAsync(u => u.Id == id); 
+                .FirstOrDefaultAsync(u => u.Id == id);
         }
     }
 }

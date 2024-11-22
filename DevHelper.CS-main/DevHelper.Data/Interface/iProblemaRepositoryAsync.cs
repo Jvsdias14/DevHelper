@@ -17,5 +17,6 @@ namespace DevHelper.Data.Interfaces
 
         Task <List<Problema>> SelecionarProblemaComTudo();
         Task <List<Problema>> Pesquisar(string query);
+        Task<List<Solucao>> BuscarSolucoesRestantesAsync(int problemaId, int numeroDeSolucoesCarregadas);
     }
 }

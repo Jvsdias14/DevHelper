@@ -25,7 +25,17 @@
             </div>
             <div>
                 <strong>Descrição:</strong>
-                <span>@Html.DisplayFor(modelItem => item.Descricao)</span>
+                <span>
+                    @if (item.Descricao.Length > 100) // Limitar a 100 caracteres
+                    {
+                        @item.Descricao.Substring(0, 100)
+                        
+                    }
+                    else
+                    {
+                        @item.Descricao
+                    }
+                </span>
             </div>
             @if (item.ArquivoProblemas != null && item.ArquivoProblemas.Any())
             {
@@ -44,7 +54,7 @@
                 <div>
                     <strong>Soluções:</strong>
                     <div class="card-deck">
-                        @foreach (var solucao in item.Solucaos)
+                        @foreach (var solucao in item.Solucaos.Take(3)) // Mostrar apenas 3 soluções
                         {
                             <div class="card clickable-card" data-url="@Url.Page("/PgSolucao/Details", new { Id = solucao.Id })">
                                 <div class="card-body">
@@ -53,6 +63,10 @@
                             </div>
                         }
                     </div>
+                    @if (item.Solucaos.Count() > 3)
+                    {
+                        <button class="btn btn-load-more" data-problema-id="@item.Id" data-solucoes-carregadas="3">Carregar mais soluções</button>
+                    }
                 </div>
             }
         </div>
@@ -65,6 +79,35 @@
         document.querySelectorAll('.clickable-card').forEach(card => {
             card.addEventListener('click', function () {
                 window.location.href = this.dataset.url;
+            });
+        });
+
+        document.querySelectorAll('.btn-load-more').forEach(button => {
+            button.addEventListener('click', function () {
+                const problemaId = this.dataset.problemaId;
+                const numeroDeSolucoesCarregadas = parseInt(this.dataset.solucoesCarregadas);
+                const problemElement = this.closest('.feed-item');
+                const cardDeck = problemElement.querySelector('.card-deck');
+
+                fetch(`/api/solucoes/${problemaId}/restantes?carregadas=${numeroDeSolucoesCarregadas}`)
+                    .then(response => response.json())
+                    .then(data => {
+                        data.forEach(solucao => {
+                            const card = document.createElement('div');
+                            card.classList.add('card', 'clickable-card');
+                            card.dataset.url = `/PgSolucao/Details?id=${solucao.Id}`;
+                            card.innerHTML = `
+                                        <div class="card-body">
+                                            <p class="card-text">${solucao.Descricao}</p>
+                                        </div>
+                                    `;
+                            cardDeck.appendChild(card);
+                        });
+                        this.dataset.solucoesCarregadas = numeroDeSolucoesCarregadas + data.length;
+                        if (data.length === 0) {
+                            this.style.display = 'none'; // Ocultar o botão se não houver mais soluções
+                        }
+                    });
             });
         });
     </script>
@@ -126,4 +169,17 @@
         color: #000;
         text-decoration: none;
     }
+
+    .btn.btn-custom, .btn.btn-load-more {
+        background-color: #22ffb6;
+        color: #000;
+        border: none;
+        padding: 10px 20px;
+        cursor: pointer;
+    }
+
+        .btn.btn-custom:hover, .btn.btn-load-more:hover {
+            background-color: #1ccc9a;
+            color: #fff;
+        }
 </style>

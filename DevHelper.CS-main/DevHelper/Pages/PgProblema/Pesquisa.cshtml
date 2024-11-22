@@ -27,7 +27,17 @@
                 </div>
                 <div>
                     <strong>Descrição:</strong>
-                    <span>@Html.DisplayFor(modelItem => item.Descricao)</span>
+                    <textarea class="form-control" rows="10" readonly>
+                        @if (item.Descricao.Length > 100)
+                        {
+                            @item.Descricao.Substring(0, 100)
+                          
+                       }
+                        else
+                        {
+                            @item.Descricao
+                        }
+        </textarea>
                 </div>
             </div>
             <hr />
@@ -73,4 +83,9 @@
         .clickable-label:hover {
             text-decoration: underline;
         }
+
+    .form-control[readonly] {
+        background-color: #f8f9fa;
+        border-color: #ced4da;
+    }
 </style>

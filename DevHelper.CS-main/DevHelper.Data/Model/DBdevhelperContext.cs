@@ -29,7 +29,7 @@ public partial class DBdevhelperContext : DbContext
     {
         if (optionsBuilder.IsConfigured)
         {
-            optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=devhelper;Trusted_connection=True;TrustServerCertificate=True", options => options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null));
+            optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=devhelperprojeto;Trusted_connection=True;TrustServerCertificate=True", options => options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(10), null));
         }
             
     }
@@ -140,7 +140,7 @@ public partial class DBdevhelperContext : DbContext
                 .HasMaxLength(100)
                 .IsUnicode(false);
             entity.Property(e => e.Senha)
-                .HasMaxLength(200)
+                .HasMaxLength(256)
                 .IsUnicode(false);
         });
 
