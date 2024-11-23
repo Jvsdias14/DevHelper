@@ -6,6 +6,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DevHelper.Data.Repository
 {
@@ -53,6 +54,8 @@ namespace DevHelper.Data.Repository
             await db.SaveChangesAsync();
         }
 
+        
+
         public Solucao SelecionaPelaChave(int id)
         {
             return db.Solucoes.Find(id);
@@ -71,6 +74,13 @@ namespace DevHelper.Data.Repository
         public async Task<List<Solucao>> SelecionTodosAsync()
         {
             return await db.Solucoes.OrderBy(p => p.Id).ToListAsync();
+        }
+
+        public async Task<List<Solucao>> SeleccionarSolucoesPorProblema(int idproblema)
+        {
+            return await db.Solucoes 
+                .Where(p => p.ProblemaId == idproblema)
+                .ToListAsync();
         }
     }
 }

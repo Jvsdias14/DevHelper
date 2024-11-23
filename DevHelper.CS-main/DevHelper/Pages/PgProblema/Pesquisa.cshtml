@@ -13,31 +13,21 @@
         @foreach (var item in Model.Problemas)
         {
             <div class="feed-item">
-                <div>
+                <div class="mb-3">
                     <strong>Usuário:</strong>
                     <span class="clickable-label" data-url="@Url.Page("/PgCadUsuario/Details", new { Id = item.Usuario.Id })">
                         @Html.DisplayFor(modelItem => item.Usuario.Nome)
                     </span>
                 </div>
-                <div>
+                <div class="mb-3">
                     <strong>Nome do problema:</strong>
                     <span class="clickable-label" data-url="@Url.Page("/PgProblema/Details", new { Id = item.Id })">
                         @Html.DisplayFor(modelItem => item.Nome)
                     </span>
                 </div>
-                <div>
+                <div class="mb-3">
                     <strong>Descrição:</strong>
-                    <textarea class="form-control" rows="10" readonly>
-                        @if (item.Descricao.Length > 100)
-                        {
-                            @item.Descricao.Substring(0, 100)
-                          
-                       }
-                        else
-                        {
-                            @item.Descricao
-                        }
-        </textarea>
+                    <textarea class="form-control" rows="3" readonly>@item.Descricao</textarea>
                 </div>
             </div>
             <hr />

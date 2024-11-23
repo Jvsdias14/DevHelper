@@ -23,7 +23,7 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
         private readonly iProblemaRepositoryAsync ProblemaRepository;
         private readonly iSolucaoRepositoryAsync SolucaoRepository;
 
-        public DetailsModel(iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpContextAccessor, iSolucaoRepositoryAsync solucaoRepository,iProblemaRepositoryAsync problemarepository)
+        public DetailsModel(iUsuarioRepositoryAsync usuariorepositoryasync, IHttpContextAccessor httpContextAccessor, iSolucaoRepositoryAsync solucaoRepository, iProblemaRepositoryAsync problemarepository)
         {
             UsuarioRepository = usuariorepositoryasync;
             _httpContextAccessor = httpContextAccessor;
@@ -31,6 +31,7 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             ProblemaRepository = problemarepository;
         }
 
+        [BindProperty]
         public Usuario Usuario { get; set; } = default!;
 
         public bool IsCurrentUser { get; set; }
@@ -51,8 +52,8 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             }
 
             Usuario = usuario;
-            Problemas = usuario.Problemas;
-            Solucoes = usuario.Solucaos;
+            Problemas = usuario.Problemas ?? new List<Problema>();
+            Solucoes = usuario.Solucaos ?? new List<Solucao>();
 
             foreach (var solucao in Solucoes)
             {
@@ -65,6 +66,35 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
             return Page();
         }
 
+        public async Task<IActionResult> OnPostAsync()
+        {
+            if (Usuario == null)
+            {
+                return NotFound();
+            }
+
+            var loggedInUserId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            // Buscar o usuário no banco de dados com os valores antigos
+            var usuarioToUpdate = await UsuarioRepository.SelecionaPelaChaveAsync(loggedInUserId);
+
+            if (usuarioToUpdate == null)
+            {
+                return NotFound();
+            }
+
+            // Atualizar a biografia com o novo valor vindo do front-end
+            usuarioToUpdate.Biografia = Usuario.Biografia;
+
+            // Salvar as alterações no banco de dados
+            await UsuarioRepository.AlterarAsync(usuarioToUpdate);
+
+
+
+            //return RedirectToPage("/PgCadUsuario/Details", new { id = loggedInUserId });
+
+            return RedirectToPage("../Index");
+        }
+
         public async Task<IActionResult> OnPostLogoutAsync()
         {
             await HttpContext.SignOutAsync(CookieAuthenticationDefaults.AuthenticationScheme);
@@ -72,4 +102,3 @@ namespace DevHelper.Razor.Pages.PgCadUsuario
         }
     }
 }
-

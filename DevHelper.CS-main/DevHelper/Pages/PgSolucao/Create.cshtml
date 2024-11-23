@@ -13,11 +13,11 @@
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <h3>Problema:</h3>
-                <label class="control-label">@Model.Problema?.Nome ?? "Problema não encontrado"</label>
+                <label class="control-label">@Model.Problema?.Nome</label>
             </div>
             <div class="form-group">
                 <h3>Descrição do problema:</h3>
-                <label class="control-label">@Model.Problema?.Descricao ?? "Descrição não encontrada"</label>
+                <label class="control-label">@Model.Problema?.Descricao</label>
             </div>
             <input type="hidden" asp-for="Solucao.ProblemaId" />
             <input type="hidden" asp-for="Solucao.UsuarioId" />

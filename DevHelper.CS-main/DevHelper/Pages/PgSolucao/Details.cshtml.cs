@@ -1,27 +1,29 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interface;
+using DevHelper.Data.Interfaces;
 
 namespace DevHelper.Razor.Pages.PgSolucao
 {
     public class DetailsModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly iSolucaoRepositoryAsync SolucaoRepository;
+        private readonly iProblemaRepositoryAsync ProblemaRepository;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public DetailsModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public DetailsModel(iSolucaoRepositoryAsync solucaoRepository, iProblemaRepositoryAsync problemaRepository, iUsuarioRepositoryAsync usuarioRepository)
         {
-            _context = context;
+            SolucaoRepository = solucaoRepository;
+            ProblemaRepository = problemaRepository;
+            UsuarioRepository = usuarioRepository;
         }
 
         public Solucao Solucao { get; set; } = default!;
         public Problema Problema { get; set; } = default!;
         public Usuario Usuario { get; set; } = default!;
-
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -30,20 +32,21 @@ namespace DevHelper.Razor.Pages.PgSolucao
                 return NotFound();
             }
 
-            var solucao = await _context.Solucoes.FirstOrDefaultAsync(m => m.Id == id);
-            var problema = await _context.Problemas.FirstOrDefaultAsync(m => m.Id == solucao.ProblemaId);
-            var usuario = await _context.Usuarios.FirstOrDefaultAsync(m => m.Id == solucao.UsuarioId);
-
+            var solucao = await SolucaoRepository.SelecionaPelaChaveAsync(id.Value);
             if (solucao == null)
             {
                 return NotFound();
             }
-            else
+
+            Solucao = solucao;
+            Problema = await ProblemaRepository.SelecionaPelaChaveAsync(solucao.ProblemaId);
+            Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(solucao.UsuarioId);
+
+            if (Problema == null || Usuario == null)
             {
-                Solucao = solucao;
-                Problema = problema;
-                Usuario = usuario;
+                return NotFound();
             }
+
             return Page();
         }
     }

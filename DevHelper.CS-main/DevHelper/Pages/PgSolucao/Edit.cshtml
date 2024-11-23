@@ -2,44 +2,81 @@
 @model DevHelper.Razor.Pages.PgSolucao.EditModel
 
 @{
-    ViewData["Title"] = "Edit";
+    ViewData["Title"] = "Editar Solução";
 }
 
-<h1>Edit</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card mt-5">
+                <div class="card-header text-center">
+                    <h1>Editar Solução</h1>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                        <input type="hidden" asp-for="Solucao.Id" />
 
-<h4>Solucao</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <input type="hidden" asp-for="Solucao.Id" />
-            <div class="form-group">
-                <label asp-for="Solucao.ProblemaId" class="control-label"></label>
-                <select asp-for="Solucao.ProblemaId" class="form-control" asp-items="ViewBag.ProblemaId"></select>
-                <span asp-validation-for="Solucao.ProblemaId" class="text-danger"></span>
+                        <input type="hidden" name="id" value="@Model.Solucao.Id" />
+
+                        <div class="form-group mb-4">
+                            <label class="control-label">Problema</label>
+                            <input class="form-control" value="@Model.Problema?.Nome" readonly />
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label class="control-label">Usuário</label>
+                            <input class="form-control" value="@Model.Usuario?.Nome" readonly />
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Solucao.Descricao" class="control-label">Descrição</label>
+                            <textarea asp-for="Solucao.Descricao" class="form-control" rows="5" maxlength="1500"></textarea>
+                            <span asp-validation-for="Solucao.Descricao" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group d-flex justify-content-between">
+                            <input type="submit" value="Salvar" class="btn btn-custom" />
+                            <a asp-page="../Index" class="btn btn-secondary text-center">Volte para o Feed</a>
+                        </div>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Solucao.UsuarioId" class="control-label"></label>
-                <select asp-for="Solucao.UsuarioId" class="form-control" asp-items="ViewBag.UsuarioId"></select>
-                <span asp-validation-for="Solucao.UsuarioId" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Solucao.Descricao" class="control-label"></label>
-                <input asp-for="Solucao.Descricao" class="form-control" />
-                <span asp-validation-for="Solucao.Descricao" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Save" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-<div>
-    <a asp-page="./Index">Back to List</a>
-</div>
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
+<style>
+    .btn.btn-custom {
+        background-color: #22ffb6;
+        color: #000;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        margin: 5px;
+    }
+
+        .btn.btn-custom:hover {
+            background-color: #1ccc9a;
+            color: #fff;
+        }
+
+    .text-custom {
+        color: #22ffb6;
+    }
+
+    .btn-secondary {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+</style>

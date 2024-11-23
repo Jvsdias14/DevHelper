@@ -1,8 +1,14 @@
 ﻿@page
 @model DevHelper.Razor.Pages.PgSolucao.DetailsModel
+@using System.Security.Claims
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
 @{
     ViewData["Title"] = "Detalhes da Solução";
+    var user = HttpContextAccessor.HttpContext.User;
+    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isOwner = userId == Model.Solucao.UsuarioId.ToString();
 }
 
 <h1>Detalhes da Solução</h1>
@@ -11,30 +17,22 @@
     <h4>@Html.DisplayFor(model => model.Problema.Nome)</h4>
     <hr />
     <dl class="row">
-        <dt class="col-sm-2">
-            Descrição
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Solucao.Descricao)
-        </dd>
-        <dt class="col-sm-2">
-            Problema
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Problema.Nome)
-        </dd>
-        <dt class="col-sm-2">
-            Usuário
-        </dt>
-        <dd class="col-sm-10">
-            @Html.DisplayFor(model => model.Usuario.Nome)
-        </dd>
+        <dt class="col-sm-2">Descrição</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Solucao.Descricao)</dd>
+        <dt class="col-sm-2">Problema</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Problema.Nome)</dd>
+        <dt class="col-sm-2">Usuário</dt>
+        <dd class="col-sm-10">@Html.DisplayFor(model => model.Usuario.Nome)</dd>
     </dl>
 </div>
 
-<div class="d-flex justify-content-center align-items-center mt-4">
-    <a asp-page="/PgSolucao/Edit" asp-route-id="@Model.Solucao.Id" class="btn btn-custom">Editar</a>
-</div>
+@if (isOwner)
+{
+    <div class="d-flex justify-content-center align-items-center mt-4">
+        <a asp-page="/PgSolucao/Edit" asp-route-id="@Model.Solucao.Id" class="btn btn-custom me-2">Editar</a>
+        <a asp-page="/PgSolucao/Delete" asp-route-id="@Model.Solucao.Id" class="btn btn-danger">Deletar</a>
+    </div>
+}
 
 <style>
     .btn.btn-custom {
@@ -51,6 +49,23 @@
 
         .btn.btn-custom:hover {
             background-color: #1ccc9a;
+            color: #fff;
+        }
+
+    .btn.btn-danger {
+        background-color: #dc3545;
+        color: #fff;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 10px 20px;
+        margin: 5px;
+    }
+
+        .btn.btn-danger:hover {
+            background-color: #c82333;
             color: #fff;
         }
 

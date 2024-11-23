@@ -14,5 +14,7 @@ namespace DevHelper.Data.Interface
         Task ExcluirAsync(Solucao solucao);
         Task<Solucao> SelecionaPelaChaveAsync(int id);
         Task<List<Solucao>> SelecionTodosAsync();
+
+        Task<List<Solucao>> SeleccionarSolucoesPorProblema(int idproblema);
     }
 }

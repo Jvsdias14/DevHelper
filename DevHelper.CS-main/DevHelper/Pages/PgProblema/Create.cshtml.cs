@@ -37,9 +37,12 @@ namespace DevHelper.Razor.Pages.PgProblema
         [BindProperty]
         public IFormFileCollection UploadedFiles { get; set; }
 
-        public IActionResult OnGet()
+        public Usuario Usuario { get; set; } = default!;
+
+        public async Task<IActionResult> OnGet()
         {
-            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+            var userId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
+            Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(userId);
             if (userId == null)
             {
                 return RedirectToPage("../Index");
@@ -47,7 +50,8 @@ namespace DevHelper.Razor.Pages.PgProblema
 
             Problema = new Problema
             {
-                UsuarioId = int.Parse(userId)
+                UsuarioId = userId,
+                Usuario = Usuario
             };
 
             return Page();

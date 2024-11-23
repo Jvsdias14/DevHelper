@@ -1,25 +1,30 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interface;
+using DevHelper.Data.Interfaces;
 
 namespace DevHelper.Razor.Pages.PgSolucao
 {
     public class DeleteModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly iSolucaoRepositoryAsync SolucaoRepository;
+        private readonly iProblemaRepositoryAsync ProblemaRepository;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public DeleteModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public DeleteModel(iSolucaoRepositoryAsync solucaoRepository, iProblemaRepositoryAsync problemaRepository, iUsuarioRepositoryAsync usuarioRepository)
         {
-            _context = context;
+            SolucaoRepository = solucaoRepository;
+            ProblemaRepository = problemaRepository;
+            UsuarioRepository = usuarioRepository;
         }
 
         [BindProperty]
         public Solucao Solucao { get; set; } = default!;
+        public Problema Problema { get; set; } = default!;
+        public Usuario Usuario { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -28,16 +33,21 @@ namespace DevHelper.Razor.Pages.PgSolucao
                 return NotFound();
             }
 
-            var solucao = await _context.Solucoes.FirstOrDefaultAsync(m => m.Id == id);
-
+            var solucao = await SolucaoRepository.SelecionaPelaChaveAsync(id.Value);
             if (solucao == null)
             {
                 return NotFound();
             }
-            else
+
+            Solucao = solucao;
+            Problema = await ProblemaRepository.SelecionaPelaChaveAsync(solucao.ProblemaId);
+            Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(solucao.UsuarioId);
+
+            if (Problema == null || Usuario == null)
             {
-                Solucao = solucao;
+                return NotFound();
             }
+
             return Page();
         }
 
@@ -48,12 +58,10 @@ namespace DevHelper.Razor.Pages.PgSolucao
                 return NotFound();
             }
 
-            var solucao = await _context.Solucoes.FindAsync(id);
+            var solucao = await SolucaoRepository.SelecionaPelaChaveAsync(id.Value);
             if (solucao != null)
             {
-                Solucao = solucao;
-                _context.Solucoes.Remove(Solucao);
-                await _context.SaveChangesAsync();
+                await SolucaoRepository.ExcluirAsync(solucao);
             }
 
             return RedirectToPage("../Index");

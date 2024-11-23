@@ -5,7 +5,8 @@
 @inject IHttpContextAccessor HttpContextAccessor
 
 @{
-    var userId = HttpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
+    var userId = HttpContextAccessor.HttpContext.User?.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isOwner = userId != null && Model.Problema != null && userId == Model.Problema.UsuarioId.ToString();
 }
 
 <h1>@Html.DisplayFor(model => model.Problema.Nome)</h1>
@@ -17,21 +18,49 @@
     <h5 class="col-sm-2">
         @Html.DisplayNameFor(model => model.Problema.Descricao)
     </h5>
+    <form method="post">
     <dd class="col-sm-10">
-        <textarea class="form-control" rows="10" readonly>@Model.Problema.Descricao</textarea> <!-- Aumentado para 10 linhas -->
+            @if (isOwner)
+            {
+            <textarea class="form-control" asp-for="Problema.Descricao" rows="10">@Model.Problema.Descricao</textarea>
+            }
+            else
+            {
+            <textarea class="form-control" asp-for="Problema.Descricao" rows="10" readonly>@Model.Problema.Descricao</textarea>
+            }
     </dd>
+        @if (isOwner)
+        {
+        <div class="d-flex justify-content-end mt-2 mb-4">
+            <button type="submit" class="btn btn-custom me-2">Salvar Alterações</button>
+            <a asp-page="/PgProblema/Delete" asp-route-id="@Model.Problema.Id" class="btn btn-custom">Deletar Problema</a>
+        </div>
+        }
+    </form>
 </div>
 
-<div class="d-flex justify-content-between align-items-center">
-    @if (userId == Model.Problema.UsuarioId.ToString())
-    {
-        <a asp-page="/PgProblema/Delete" asp-route-id="@Model.Problema.Id" class="btn btn-custom">Deletar Problema</a>
-    }
-    else
-    {
-        <a asp-page="/PgSolucao/Create" asp-route-problemaId="@Model.Problema.Id" class="btn btn-custom">Criar Solução</a>
-    }
-</div>
+<h3 class="d-flex justify-content-between align-items-center mb-3">
+    Soluções
+    <a asp-page="/PgSolucao/Create" asp-route-problemaId="@Model.Problema.Id" class="btn btn-custom">Criar Solução</a>
+</h3>
+
+@if (Model.Problema.Solucaos != null && Model.Problema.Solucaos.Any())
+{
+    <div class="solution-list">
+        @foreach (var solucao in Model.Problema.Solucaos)
+        {
+            <div class="solution-item mb-3">
+                <h5>Usuário: @solucao.Usuario.Nome</h5>
+                <p>@solucao.Descricao</p>
+                <a asp-page="/PgSolucao/Details" asp-route-id="@solucao.Id" class="btn btn-sm btn-custom">Ver Detalhes</a>
+            </div>
+        }
+    </div>
+}
+else
+{
+    <p>Nenhuma solução cadastrada.</p>
+}
 
 @section Scripts {
     <script>
@@ -64,27 +93,22 @@
         color: #22ffb6;
     }
 
-    .feed-container {
+    .solution-list {
         margin-top: 20px;
     }
 
-    .feed-item {
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #ddd;
+    .solution-item {
+        border: 1px solid #ddd;
+        padding: 15px;
+        border-radius: 5px;
+        background-color: #f9f9f9;
     }
 
-        .feed-item div {
+        .solution-item h5 {
             margin-bottom: 10px;
         }
 
-    .clickable-label {
-        cursor: pointer;
-        color: #000;
-        text-decoration: none;
-    }
-
-        .clickable-label:hover {
-            text-decoration: underline;
+        .solution-item p {
+            margin-bottom: 15px;
         }
 </style>

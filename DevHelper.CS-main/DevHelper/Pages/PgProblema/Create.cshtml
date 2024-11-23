@@ -12,22 +12,22 @@
         <form method="post" enctype="multipart/form-data">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
-                <label asp-for="Problema.UsuarioId" class="control-label"></label>
-                <input asp-for="Problema.UsuarioId" class="form-control" readonly />
+                <h3>@Model.Problema.Usuario.Nome</h3>
+                <input type="hidden" asp-for="Problema.UsuarioId" value="@Model.Problema.Usuario.Id" />
                 <span asp-validation-for="Problema.UsuarioId" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Problema.Nome" class="control-label"></label>
+                <h3>Nome do Problema</h3>
                 <input asp-for="Problema.Nome" class="form-control" />
                 <span asp-validation-for="Problema.Nome" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <label asp-for="Problema.Descricao" class="control-label"></label>
+                <h3>@Html.LabelFor(m => m.Problema.Descricao)</h3>
                 <textarea asp-for="Problema.Descricao" class="form-control" rows="10"></textarea>
                 <span asp-validation-for="Problema.Descricao" class="text-danger"></span>
             </div>
             <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-custom" style="margin-top: 7.5px;" />
+                <input type="submit" value="Criar" class="btn btn-custom" style="margin-top: 7.5px;" />
             </div>
         </form>
     </div>
@@ -68,6 +68,8 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        padding: 10px 20px;
+        margin: 5px;
     }
 
         .btn.btn-custom:hover {

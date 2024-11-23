@@ -1,26 +1,31 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
 using DevHelper.Data.Model;
+using DevHelper.Data.Interface;
+using DevHelper.Data.Interfaces;
 
 namespace DevHelper.Razor.Pages.PgSolucao
 {
     public class EditModel : PageModel
     {
-        private readonly DevHelper.Data.Model.DBdevhelperContext _context;
+        private readonly iSolucaoRepositoryAsync SolucaoRepository;
+        private readonly iProblemaRepositoryAsync ProblemaRepository;
+        private readonly iUsuarioRepositoryAsync UsuarioRepository;
 
-        public EditModel(DevHelper.Data.Model.DBdevhelperContext context)
+        public EditModel(iSolucaoRepositoryAsync solucaoRepository, iProblemaRepositoryAsync problemaRepository, iUsuarioRepositoryAsync usuarioRepository)
         {
-            _context = context;
+            SolucaoRepository = solucaoRepository;
+            ProblemaRepository = problemaRepository;
+            UsuarioRepository = usuarioRepository;
         }
 
         [BindProperty]
         public Solucao Solucao { get; set; } = default!;
+        public Problema Problema { get; set; } = default!;
+        public Usuario Usuario { get; set; } = default!;
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -29,50 +34,39 @@ namespace DevHelper.Razor.Pages.PgSolucao
                 return NotFound();
             }
 
-            var solucao =  await _context.Solucoes.FirstOrDefaultAsync(m => m.Id == id);
+            var solucao = await SolucaoRepository.SelecionaPelaChaveAsync(id.Value);
             if (solucao == null)
             {
                 return NotFound();
             }
+
             Solucao = solucao;
-           ViewData["ProblemaId"] = new SelectList(_context.Problemas, "Id", "Descricao");
-           ViewData["UsuarioId"] = new SelectList(_context.Usuarios, "Id", "Email");
+            Problema = await ProblemaRepository.SelecionaPelaChaveAsync(solucao.ProblemaId);
+            Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(solucao.UsuarioId);
+
+            if (Problema == null || Usuario == null)
+            {
+                return NotFound();
+            }
+
             return Page();
         }
 
-        // To protect from overposting attacks, enable the specific properties you want to bind to.
-        // For more information, see https://aka.ms/RazorPagesCRUD.
-        public async Task<IActionResult> OnPostAsync()
+        public async Task<IActionResult> OnPostAsync(int id)
         {
-            if (!ModelState.IsValid)
+
+            var solucaoToUpdate = await SolucaoRepository.SelecionaPelaChaveAsync(id);
+            if (solucaoToUpdate == null)
             {
-                return Page();
+                return NotFound();
             }
 
-            _context.Attach(Solucao).State = EntityState.Modified;
+            solucaoToUpdate.Descricao = Solucao.Descricao;
 
-            try
-            {
-                await _context.SaveChangesAsync();
-            }
-            catch (DbUpdateConcurrencyException)
-            {
-                if (!SolucaoExists(Solucao.Id))
-                {
-                    return NotFound();
-                }
-                else
-                {
-                    throw;
-                }
-            }
+            await SolucaoRepository.AlterarAsync(solucaoToUpdate);
 
+            //return RedirectToPage("./Details", new { id = solucaoToUpdate.Id });
             return RedirectToPage("../Index");
-        }
-
-        private bool SolucaoExists(int id)
-        {
-            return _context.Solucoes.Any(e => e.Id == id);
         }
     }
 }

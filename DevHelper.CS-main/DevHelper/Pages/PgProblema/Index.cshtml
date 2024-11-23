@@ -3,6 +3,16 @@
 
 @{
     ViewData["Title"] = "Feed";
+
+    string TruncateDescription(string descricao, int maxLength)
+    {
+        if (string.IsNullOrEmpty(descricao) || descricao.Length <= maxLength)
+        {
+            return descricao;
+        }
+        var lastSpaceIndex = descricao.LastIndexOf(' ', maxLength);
+        return lastSpaceIndex == -1 ? descricao.Substring(0, maxLength) : descricao.Substring(0, lastSpaceIndex);
+    }
 }
 
 <h1>Feed</h1>
@@ -26,10 +36,11 @@
             <div>
                 <strong>Descrição:</strong>
                 <span>
-                    @if (item.Descricao.Length > 100) // Limitar a 100 caracteres
+                    @if (item.Descricao.Length > 100)
                     {
-                        @item.Descricao.Substring(0, 100)
-                        
+                        @TruncateDescription(item.Descricao, 100)
+
+                        <span class="leia-mais-separator">...</span> <a href="@Url.Page("/PgProblema/Details", new { Id = item.Id })" class="leia-mais-link">Leia mais</a>
                     }
                     else
                     {
@@ -65,7 +76,7 @@
                     </div>
                     @if (item.Solucaos.Count() > 3)
                     {
-                        <button class="btn btn-load-more" data-problema-id="@item.Id" data-solucoes-carregadas="3">Carregar mais soluções</button>
+                        <a href="@Url.Page("/PgProblema/Details", new { Id = item.Id })" class="btn btn-load-more">Carregar mais soluções</a>
                     }
                 </div>
             }
@@ -79,35 +90,6 @@
         document.querySelectorAll('.clickable-card').forEach(card => {
             card.addEventListener('click', function () {
                 window.location.href = this.dataset.url;
-            });
-        });
-
-        document.querySelectorAll('.btn-load-more').forEach(button => {
-            button.addEventListener('click', function () {
-                const problemaId = this.dataset.problemaId;
-                const numeroDeSolucoesCarregadas = parseInt(this.dataset.solucoesCarregadas);
-                const problemElement = this.closest('.feed-item');
-                const cardDeck = problemElement.querySelector('.card-deck');
-
-                fetch(`/api/solucoes/${problemaId}/restantes?carregadas=${numeroDeSolucoesCarregadas}`)
-                    .then(response => response.json())
-                    .then(data => {
-                        data.forEach(solucao => {
-                            const card = document.createElement('div');
-                            card.classList.add('card', 'clickable-card');
-                            card.dataset.url = `/PgSolucao/Details?id=${solucao.Id}`;
-                            card.innerHTML = `
-                                        <div class="card-body">
-                                            <p class="card-text">${solucao.Descricao}</p>
-                                        </div>
-                                    `;
-                            cardDeck.appendChild(card);
-                        });
-                        this.dataset.solucoesCarregadas = numeroDeSolucoesCarregadas + data.length;
-                        if (data.length === 0) {
-                            this.style.display = 'none'; // Ocultar o botão se não houver mais soluções
-                        }
-                    });
             });
         });
     </script>
@@ -128,16 +110,21 @@
             margin-bottom: 10px;
         }
 
-    .clickable-label, .clickable-card {
+    .clickable-label, .clickable-card, .leia-mais-link {
         cursor: pointer;
         color: #000;
         text-decoration: none;
     }
 
-        .clickable-label:hover, .clickable-card:hover {
+        .clickable-label:hover, .clickable-card:hover, .leia-mais-link:hover {
             text-decoration: underline;
             color: #000; /* Manter a cor preta ao passar o mouse */
         }
+
+    .leia-mais-separator {
+        display: inline-block;
+        margin-right: 5px; /* Espaço entre a descrição e o link Leia mais */
+    }
 
     .card-deck {
         display: flex;
@@ -176,6 +163,8 @@
         border: none;
         padding: 10px 20px;
         cursor: pointer;
+        text-decoration: none;
+        display: inline-block;
     }
 
         .btn.btn-custom:hover, .btn.btn-load-more:hover {

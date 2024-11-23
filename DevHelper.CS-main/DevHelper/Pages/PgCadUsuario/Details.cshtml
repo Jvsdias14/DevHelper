@@ -8,11 +8,12 @@
     var user = HttpContextAccessor.HttpContext.User;
     var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
     var userName = user.FindFirstValue(ClaimTypes.Name);
+    var isOwner = Model.Usuario != null && userId == Model.Usuario.Id.ToString();
 }
 
 <h1 class="d-flex justify-content-between align-items-center">
     @Html.DisplayFor(model => model.Usuario.Nome)
-    @if (userId == Model.Usuario.Id.ToString())
+    @if (isOwner)
     {
         <div class="d-flex">
             <div class="flex-fill me-2">
@@ -29,66 +30,121 @@
 
 <div>
     <hr />
-    <dl class="row">
-        <dt class="col-sm-12">
-            @Html.DisplayNameFor(model => model.Usuario.Biografia)
-        </dt>
-        <dd class="col-sm-12">
-            <textarea asp-for="Usuario.Biografia" class="form-control w-100" rows="5" readonly></textarea>
-        </dd>
-    </dl>
+    <form method="post" style="margin-bottom: 20px;">
+        <dl class="row">
+            <dt class="col-sm-12">
+                @Html.DisplayNameFor(model => model.Usuario.Biografia)
+            </dt>
+            <dd class="col-sm-12">
+                @if (isOwner)
+                {
+                    <textarea asp-for="Usuario.Biografia" class="form-control w-100" rows="5"></textarea>
+                }
+                else
+                {
+                    <textarea asp-for="Usuario.Biografia" class="form-control w-100" rows="5" readonly></textarea>
+                }
+            </dd>
+        </dl>
+
+        @if (isOwner)
+        {
+            <div class="d-flex justify-content-end">
+                <button type="submit" class="btn btn-custom">Salvar Alterações</button>
+            </div>
+        }
+    </form>
 </div>
 
 <div class="row">
     <div class="col-md-6 border-end">
         <h3>Problemas</h3>
-        <table class="table table-light">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Descrição</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var problema in Model.Problemas)
-                {
+        @if (Model.Problemas != null && Model.Problemas.Any())
+        {
+            <table class="table table-light fixed-table">
+                <thead>
                     <tr>
-                        <td>@problema.Nome</td>
-                        <td>@problema.Descricao</td>
-                        <td>
-                            <a asp-page="/PgProblema/Details" asp-route-id="@problema.Id" class="btn btn-sm btn-custom">Detalhes</a>
-                        </td>
+                        <th style="width: 30%;">Nome</th>
+                        <th style="width: 55%;">Descrição</th>
+                        <th style="width: 15%;"></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var problema in Model.Problemas)
+                    {
+                        <tr>
+                            <td>@problema.Nome</td>
+                            <td>@TruncateText(problema.Descricao, 150)</td>
+                            <td>
+                                <a asp-page="/PgProblema/Details" asp-route-id="@problema.Id" class="btn btn-sm btn-custom">Detalhes</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Nenhum problema encontrado.</p>
+        }
     </div>
     <div class="col-md-6">
         <h3>Soluções</h3>
-        <table class="table table-light">
-            <thead>
-                <tr>
-                    <th>Nome</th>
-                    <th>Descrição</th>
-                    <th></th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var solucao in Model.Solucoes)
-                {
+        @if (Model.Solucoes != null && Model.Solucoes.Any())
+        {
+            <table class="table table-light fixed-table">
+                <thead>
                     <tr>
-                        <td>@(solucao.Problema != null ? solucao.Problema.Nome : "Problema não encontrado")</td>
-                        <td>@solucao.Descricao</td>
-                        <td>
-                            <a asp-page="/PgSolucao/Details" asp-route-id="@solucao.Id" class="btn btn-sm btn-custom">Detalhes</a>
-                        </td>
+                        <th style="width: 30%;">Nome</th>
+                        <th style="width: 55%;">Descrição</th>
+                        <th style="width: 15%;"></th>
                     </tr>
-                }
-            </tbody>
-        </table>
+                </thead>
+                <tbody>
+                    @foreach (var solucao in Model.Solucoes)
+                    {
+                        <tr>
+                            <td>@solucao.Problema?.Nome</td>
+                            <td>@TruncateText(solucao.Descricao, 150)</td>
+                            <td>
+                                <a asp-page="/PgSolucao/Details" asp-route-id="@solucao.Id" class="btn btn-sm btn-custom">Detalhes</a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        }
+        else
+        {
+            <p>Nenhuma solução encontrada.</p>
+        }
     </div>
 </div>
+
+@functions {
+    string TruncateText(string text, int maxLength)
+    {
+        if (string.IsNullOrEmpty(text) || text.Length <= maxLength)
+        {
+            return text;
+        }
+
+        // Tentativa de truncar sem quebrar palavras
+        int end = maxLength;
+        while (end > 0 && text[end] != ' ')
+        {
+            end--;
+        }
+
+        // Se não houver espaço, simplesmente truncar no limite máximo de caracteres
+        if (end == 0)
+        {
+            end = maxLength;
+        }
+
+        return text.Substring(0, end) + "...";
+    }
+}
 
 <style>
     .btn.btn-custom {
@@ -99,6 +155,7 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        width: 100%;
     }
 
         .btn.btn-custom:hover {
@@ -115,8 +172,10 @@
         color: #000;
     }
 
-    .table th, .table td {
-        border: 1px solid #333; /* Cor preta ou tom escuro para as divisões da tabela */
+    .fixed-table th, .fixed-table td {
+        border: 1px solid #333;
+        word-wrap: break-word;
+        white-space: pre-line;
     }
 
     .list-group-item {
@@ -130,5 +189,11 @@
 
     .float-end {
         float: right;
+    }
+
+    /* Ajustes para garantir a flexibilidade das tabelas */
+    .table {
+        table-layout: fixed;
+        width: 100%;
     }
 </style>

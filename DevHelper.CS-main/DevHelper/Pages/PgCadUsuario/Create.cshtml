@@ -5,41 +5,80 @@
     ViewData["Title"] = "Cadastro";
 }
 
-<h1>Cadastro do Usuário</h1>
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-md-6">
+            <div class="card mt-5">
+                <div class="card-header">
+                    <h1>Cadastro do Usuário</h1>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
 
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form method="post">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            <div class="form-group">
-                <label asp-for="Usuario.Nome" class="control-label"></label>
-                <input asp-for="Usuario.Nome" class="form-control" />
-                <span asp-validation-for="Usuario.Nome" class="text-danger"></span>
+                        <div class="form-group">
+                            <label asp-for="Usuario.Nome" class="control-label"></label>
+                            <input asp-for="Usuario.Nome" class="form-control" />
+                            <span asp-validation-for="Usuario.Nome" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group">
+                            <label asp-for="Usuario.Email" class="control-label"></label>
+                            <input asp-for="Usuario.Email" class="form-control" />
+                            <span asp-validation-for="Usuario.Email" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Usuario.Senha" class="control-label"></label>
+                            <input asp-for="Usuario.Senha" class="form-control" type="password" />
+                            <span asp-validation-for="Usuario.Senha" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <label asp-for="Usuario.Biografia" class="control-label"></label>
+                            <textarea asp-for="Usuario.Biografia" class="form-control" rows="5" maxlength="1500"></textarea>
+                            <span asp-validation-for="Usuario.Biografia" class="text-danger"></span>
+                        </div>
+
+                        <div class="form-group mb-4">
+                            <input type="submit" value="Cadastrar" class="btn btn-custom" />
+                        </div>
+                        <a asp-page="/Index" class="text-black">Voltar ao Login</a>
+                    </form>
+                </div>
             </div>
-            <div class="form-group">
-                <label asp-for="Usuario.Email" class="control-label"></label>
-                <input asp-for="Usuario.Email" class="form-control" />
-                <span asp-validation-for="Usuario.Email" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Usuario.Senha" class="control-label"></label>
-                <input asp-for="Usuario.Senha" class="form-control" />
-                <span asp-validation-for="Usuario.Senha" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <label asp-for="Usuario.Biografia" class="control-label"></label>
-                <input asp-for="Usuario.Biografia" class="form-control" />
-                <span asp-validation-for="Usuario.Biografia" class="text-danger"></span>
-            </div>
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-primary" />
-            </div>
-        </form>
+        </div>
     </div>
 </div>
 
-
 @section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
 }
+
+<style>
+    .btn.btn-custom {
+        background-color: #22ffb6;
+        color: #000;
+        border: none;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+    }
+
+        .btn.btn-custom:hover {
+            background-color: #1ccc9a;
+            color: #fff;
+        }
+
+    .text-black {
+        color: #000;
+    }
+
+        .text-black:hover {
+            color: #22ffb6;
+        }
+</style>
