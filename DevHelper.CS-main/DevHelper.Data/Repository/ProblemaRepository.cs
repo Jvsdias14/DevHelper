@@ -101,6 +101,14 @@ namespace DevHelper.Data.Repositories
                           .ToListAsync();
         }
 
+        public async Task<List<ArquivoProblema>> BuscarArquivosAsync(int problemaId)
+        {
+            return await db.ArquivoProblemas.Where(a => a.ProblemaId == problemaId).ToListAsync();
+        }
 
+        public async Task<Problema> ProblemaCompletoAsync(int problemaId)
+        {
+            return await db.Problemas.Include(p => p.ArquivoProblemas).Include(p => p.Solucaos).Include(p => p.Usuario).FirstOrDefaultAsync(p => p.Id == problemaId);
+        }
     }
 }

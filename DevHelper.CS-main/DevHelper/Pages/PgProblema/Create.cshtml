@@ -9,7 +9,7 @@
 <hr />
 <div class="row">
     <div class="col-md-8">
-        <form method="post" enctype="multipart/form-data">
+        <form method="post" enctype="multipart/form-data" id="problemaForm">
             <div asp-validation-summary="ModelOnly" class="text-danger"></div>
             <div class="form-group">
                 <h3>@Model.Problema.Usuario.Nome</h3>
@@ -56,6 +56,33 @@
             listItem.textContent = fileName;
             fileList.appendChild(listItem);
         }
+    });
+
+    document.getElementById('problemaForm').addEventListener('submit', function (e) {
+        e.preventDefault(); // Prevent default form submission
+        const formData = new FormData(this);
+        const fileInput = document.getElementById('fileInput');
+
+        for (let i = 0; i < fileInput.files.length; i++) {
+            formData.append('UploadedFiles', fileInput.files[i]);
+        }
+
+        for (let pair of formData.entries()) {
+            console.log(pair[0] + ': ' + pair[1]); // Log to confirm form data before submission
+        }
+
+        fetch(this.action, {
+            method: 'POST',
+            body: formData,
+        }).then(response => response.json())
+            .then(result => {
+                if (result.redirectUrl) {
+                    window.location.href = result.redirectUrl; // Redirect after successful submission
+                } else {
+                    console.error('Redirection URL not found in the response.');
+                }
+            })
+            .catch(error => console.error('Error:', error));
     });
 </script>
 

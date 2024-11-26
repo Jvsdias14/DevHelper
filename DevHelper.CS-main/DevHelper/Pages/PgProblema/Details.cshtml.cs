@@ -34,14 +34,14 @@ namespace DevHelper.Razor.Pages.PgProblema
                 return NotFound();
             }
 
-            var problema = await Repository.SelecionaPelaChaveAsync(id.Value);
-            var usuario = await UsuarioRepository.SelecionaPelaChaveAsync(problema.UsuarioId);
-            var solucoes = await SolucaoRepository.SeleccionarSolucoesPorProblema(problema.Id);
+            var problema = await Repository.ProblemaCompletoAsync(id.Value);
+            //var usuario = await UsuarioRepository.SelecionaPelaChaveAsync(problema.UsuarioId);
+            //var solucoes = await SolucaoRepository.SeleccionarSolucoesPorProblema(problema.Id);
 
-            foreach (var solucao in solucoes)
-            {
-                solucao.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(solucao.UsuarioId);
-            }
+            //foreach (var solucao in solucoes)
+            //{
+            //    solucao.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(solucao.UsuarioId);
+            //}
 
             if (problema == null)
             {
@@ -50,8 +50,6 @@ namespace DevHelper.Razor.Pages.PgProblema
             else
             {
                 Problema = problema;
-                Usuario = usuario;
-                Problema.Solucaos = solucoes;
             }
             return Page();
         }

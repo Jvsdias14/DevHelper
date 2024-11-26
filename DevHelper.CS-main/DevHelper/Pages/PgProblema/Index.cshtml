@@ -52,12 +52,7 @@
             {
                 <div>
                     <strong>Arquivos:</strong>
-                    <ul>
-                        @foreach (var arquivo in item.ArquivoProblemas)
-                        {
-                            <li>@arquivo.Nome</li>
-                        }
-                    </ul>
+                    <span class="file-count">(@item.ArquivoProblemas.Count())</span>
                 </div>
             }
             @if (item.Solucaos != null && item.Solucaos.Any())
@@ -171,4 +166,10 @@
             background-color: #1ccc9a;
             color: #fff;
         }
+
+    .file-count {
+        color: #22ffb6;
+        font-weight: bold;
+        margin-left: 5px;
+    }
 </style>

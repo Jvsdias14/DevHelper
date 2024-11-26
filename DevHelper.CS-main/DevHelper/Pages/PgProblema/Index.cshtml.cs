@@ -24,9 +24,10 @@ namespace DevHelper.Razor.Pages.PgProblema
 
         public IList<Problema> Problema { get; set; } = default!;
 
-        public async Task OnGetAsync()
+        public async Task<IActionResult> OnGetAsync()
         {
             Problema = await Repository.SelecionarProblemaComTudo();
+            return Page();
         }
     }
 }

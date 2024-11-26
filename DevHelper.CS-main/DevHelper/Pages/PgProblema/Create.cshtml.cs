@@ -1,21 +1,22 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Threading.Tasks;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
-using DevHelper.Data.Model;
-using Microsoft.AspNetCore.Http;
-using System.Security.Claims;
 using Microsoft.Extensions.Logging;
-using DevHelper.Data.Repositories;
 using DevHelper.Data.Interfaces;
+using DevHelper.Data.Model;
+using System.Security.Claims;
 using DevHelper.Data.Interface;
+using DevHelper.Data.Repository;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
     public class CreateModel : PageModel
     {
-        private readonly DBdevhelperContext _context;
+        private readonly iArquivoProblemaRepositoryAsync ArquivoProblemaRepository;
         private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly ILogger<CreateModel> _logger;
         private readonly iProblemaRepositoryAsync Repository;
@@ -23,34 +24,38 @@ namespace DevHelper.Razor.Pages.PgProblema
 
         private const string UploadsFolderPath = @"C:\Users\jvsdi\Uploads";
 
-        public CreateModel(iProblemaRepositoryAsync problemaRepositoryAsync, IHttpContextAccessor httpContextAccessor, ILogger<CreateModel> logger, iUsuarioRepositoryAsync usuariorepositoryasync)
+        public CreateModel(iProblemaRepositoryAsync problemaRepositoryAsync, IHttpContextAccessor httpContextAccessor, ILogger<CreateModel> logger, iUsuarioRepositoryAsync usuariorepositoryasync, iArquivoProblemaRepositoryAsync arquivoproblemarepository)
         {
             Repository = problemaRepositoryAsync;
             UsuarioRepository = usuariorepositoryasync;
             _httpContextAccessor = httpContextAccessor;
             _logger = logger;
+            ArquivoProblemaRepository = arquivoproblemarepository;
         }
 
         [BindProperty]
         public Problema Problema { get; set; } = default!;
 
         [BindProperty]
-        public IFormFileCollection UploadedFiles { get; set; }
+        public List<IFormFile> UploadedFiles { get; set; } = new List<IFormFile>();
 
         public Usuario Usuario { get; set; } = default!;
 
+        public ArquivoProblema ArquivoProblema { get; set; } = default!;
+
         public async Task<IActionResult> OnGet()
         {
-            var userId = int.Parse(_httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier));
-            Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(userId);
+            var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
             {
                 return RedirectToPage("../Index");
             }
 
+            Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(int.Parse(userId));
+
             Problema = new Problema
             {
-                UsuarioId = userId,
+                UsuarioId = int.Parse(userId),
                 Usuario = Usuario
             };
 
@@ -60,6 +65,7 @@ namespace DevHelper.Razor.Pages.PgProblema
         public async Task<IActionResult> OnPostAsync()
         {
             _logger.LogInformation("Iniciando OnPostAsync");
+            _logger.LogInformation($"Número de arquivos recebidos: {UploadedFiles?.Count ?? 0}");
 
             var userId = _httpContextAccessor.HttpContext.User.FindFirstValue(ClaimTypes.NameIdentifier);
             if (userId == null)
@@ -99,6 +105,8 @@ namespace DevHelper.Razor.Pages.PgProblema
             // Salvar arquivos
             foreach (var file in UploadedFiles)
             {
+                _logger.LogInformation($"Processando arquivo: {file.FileName}, Tamanho: {file.Length}");
+
                 if (file.Length > 0)
                 {
                     var filePath = Path.Combine(UploadsFolderPath, file.FileName);
@@ -114,19 +122,19 @@ namespace DevHelper.Razor.Pages.PgProblema
                         await file.CopyToAsync(stream);
                     }
 
-                    var arquivoProblema = new ArquivoProblema
+                    ArquivoProblema = new ArquivoProblema
                     {
-                        ProblemaId = Problema.Id,
+                        Problema = Problema,
                         Nome = file.FileName,
                         Referencia = filePath
                     };
 
-                    await _context.ArquivoProblemas.AddAsync(arquivoProblema);
-                    await _context.SaveChangesAsync();
+                    await ArquivoProblemaRepository.IncluirAsync(ArquivoProblema);
                 }
             }
 
-            return RedirectToPage("../Index");
+            _logger.LogInformation("Redirecionando para a página de índice");
+            return new JsonResult(new { redirectUrl = Url.Page("../Index") });
         }
     }
 }

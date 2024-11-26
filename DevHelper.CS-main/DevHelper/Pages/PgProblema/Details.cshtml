@@ -11,32 +11,61 @@
 
 <h1>@Html.DisplayFor(model => model.Problema.Nome)</h1>
 
-<div>
-    <h4>@Html.DisplayFor(model => model.Usuario.Nome)</h4>
-    <hr />
+<div class="problem-details">
+    <div class="description">
+        <h4>@Html.DisplayFor(model => model.Usuario.Nome)</h4>
+        <hr />
 
-    <h5 class="col-sm-2">
-        @Html.DisplayNameFor(model => model.Problema.Descricao)
-    </h5>
-    <form method="post">
-    <dd class="col-sm-10">
+        <h5>
+            @Html.DisplayNameFor(model => model.Problema.Descricao)
+        </h5>
+        <form method="post">
+        <dd>
+                @if (isOwner)
+                {
+                <textarea class="form-control" asp-for="Problema.Descricao" rows="10">@Model.Problema.Descricao</textarea>
+                }
+                else
+                {
+                <textarea class="form-control" asp-for="Problema.Descricao" rows="10" readonly>@Model.Problema.Descricao</textarea>
+                }
+        </dd>
             @if (isOwner)
             {
-            <textarea class="form-control" asp-for="Problema.Descricao" rows="10">@Model.Problema.Descricao</textarea>
+            <div class="d-flex justify-content-end mt-2 mb-4">
+                <button type="submit" class="btn btn-custom me-2">Salvar Alterações</button>
+                <a asp-page="/PgProblema/Delete" asp-route-id="@Model.Problema.Id" class="btn btn-custom">Deletar Problema</a>
+            </div>
             }
-            else
-            {
-            <textarea class="form-control" asp-for="Problema.Descricao" rows="10" readonly>@Model.Problema.Descricao</textarea>
-            }
-    </dd>
-        @if (isOwner)
+        </form>
+    </div>
+    <div class="divider"></div>
+    <div class="images">
+        @if (Model.Problema.ArquivoProblemas != null && Model.Problema.ArquivoProblemas.Any())
         {
-        <div class="d-flex justify-content-end mt-2 mb-4">
-            <button type="submit" class="btn btn-custom me-2">Salvar Alterações</button>
-            <a asp-page="/PgProblema/Delete" asp-route-id="@Model.Problema.Id" class="btn btn-custom">Deletar Problema</a>
-        </div>
+            <div class="image-container">
+                <div id="imageCarousel" class="carousel slide" data-bs-ride="carousel">
+                    <div class="carousel-inner">
+                        @for (int i = 0; i < Model.Problema.ArquivoProblemas.Count(); i++)
+                        {
+                            var arquivo = Model.Problema.ArquivoProblemas.ElementAt(i);
+                            <div class="carousel-item @(i == 0 ? "active" : "")">
+                                <img src="@Url.Content("~/uploads/" + arquivo.Nome)" alt="@arquivo.Nome" class="d-block w-100" />
+                            </div>
+                        }
+                    </div>
+                    <button class="carousel-control-prev" type="button" data-bs-target="#imageCarousel" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" data-bs-target="#imageCarousel" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
+                </div>
+            </div>
         }
-    </form>
+    </div>
 </div>
 
 <h3 class="d-flex justify-content-between align-items-center mb-3">
@@ -111,4 +140,48 @@ else
         .solution-item p {
             margin-bottom: 15px;
         }
+
+    .problem-details {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 20px; /* Adiciona espaçamento entre as colunas */
+    }
+
+    .description {
+        width: 60%;
+    }
+
+    .divider {
+        width: 1px;
+        background-color: #ddd;
+        height: 80%; /* Ajusta a altura da linha */
+    }
+
+    .images {
+        width: 40%;
+        text-align: center;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    .image-container {
+        background-color: #f9f9f9;
+        padding: 15px;
+        border-radius: 5px;
+        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        width: 100%; /* Garante que o contêiner ocupe toda a largura disponível */
+    }
+
+    .carousel-item img {
+        max-height: 400px;
+        object-fit: contain;
+    }
+
+    .carousel-control-prev-icon,
+    .carousel-control-next-icon {
+        background-color: #22ffb6;
+        border-radius: 50%;
+    }
 </style>

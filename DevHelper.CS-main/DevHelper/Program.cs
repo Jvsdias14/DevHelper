@@ -8,6 +8,8 @@ using Microsoft.AspNetCore.Authentication.Cookies;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
 using System.Security.Claims;
+using Microsoft.AspNetCore.Http.Features;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -23,6 +25,12 @@ builder.Services.AddDbContext<DBdevhelperContext>(options =>
 // Configuração de repositórios
 builder.Services.AddScoped<iProblemaRepository, ProblemaRepository>();
 builder.Services.AddScoped<iProblemaRepositoryAsync, ProblemaRepository>();
+
+builder.Services.AddScoped<iArquivoProblemaRepository, ArquivoProblemaRepository>();
+builder.Services.AddScoped<iArquivoProblemaRepositoryAsync, ArquivoProblemaRepository>();
+
+builder.Services.AddScoped<iArquivoSolucaoRepository, ArquivoSolucaoRepository>();
+builder.Services.AddScoped<iArquivoSolucaoRepositoryAsync, ArquivoSolucaoRepository>();
 
 builder.Services.AddScoped<iUsuarioRepository, UsuarioRepository>();
 builder.Services.AddScoped<iUsuarioRepositoryAsync, UsuarioRepository>();
@@ -55,6 +63,12 @@ builder.Services.AddSession(options =>
     options.Cookie.IsEssential = true;
 });
 
+// Adicionar configuração de limite de tamanho para uploads de arquivos
+builder.Services.Configure<FormOptions>(options =>
+{
+    options.MultipartBodyLengthLimit = 104857600; // 100MB, ajuste conforme necessário
+});
+
 var app = builder.Build();
 
 // Configuração do pipeline de requisições
@@ -66,6 +80,12 @@ if (!app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 app.UseStaticFiles();
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(
+        Path.Combine("C:\\Users\\jvsdi\\", "Uploads")),
+    RequestPath = "/uploads"
+});
 app.UseRouting();
 
 // Usar sessão antes de autenticação e autorização
