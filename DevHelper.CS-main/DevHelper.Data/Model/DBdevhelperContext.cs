@@ -23,7 +23,7 @@ namespace DevHelper.Data.Model
 
         protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
         {
-            if (!optionsBuilder.IsConfigured)
+            if (optionsBuilder.IsConfigured)
             {
                 optionsBuilder.UseSqlServer("Server=.\\SQLEXPRESS;Database=devhelper;Trusted_connection=True;TrustServerCertificate=True", options => options.EnableRetryOnFailure(5, TimeSpan.FromSeconds(30), null));
             }
@@ -87,7 +87,6 @@ namespace DevHelper.Data.Model
                     .HasMaxLength(150)
                     .IsUnicode(false);
                 entity.Property(e => e.UsuarioId).HasColumnName("Usuario_id");
-                entity.Property(e => e.Data).HasDefaultValueSql("GETDATE()"); // Adiciona a configuração de Data
 
                 entity.HasOne(d => d.Usuario).WithMany(p => p.Problemas)
                     .HasForeignKey(d => d.UsuarioId)
@@ -107,9 +106,6 @@ namespace DevHelper.Data.Model
                     .IsUnicode(false);
                 entity.Property(e => e.ProblemaId).HasColumnName("Problema_id");
                 entity.Property(e => e.UsuarioId).HasColumnName("Usuario_id");
-                entity.Property(e => e.Data).HasDefaultValueSql("GETDATE()"); // Adiciona a configuração de Data
-                entity.Property(e => e.LikeCount).HasDefaultValue(0); // Adiciona a configuração de LikeCount
-                entity.Property(e => e.DislikeCount).HasDefaultValue(0); // Adiciona a configuração de DislikeCount
 
                 entity.HasOne(d => d.Problema).WithMany(p => p.Solucaos)
                     .HasForeignKey(d => d.ProblemaId)
@@ -149,19 +145,3 @@ namespace DevHelper.Data.Model
         partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
     }
 }
-
-    //public partial class Solucao
-    //{
-
-//    OnModelCreatingPartial(modelBuilder);
-//        });
-//    }
-
-//        partial void OnModelCreatingPartial(ModelBuilder modelBuilder);
-
-//    }
-//}
-
-
-
-

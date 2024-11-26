@@ -83,11 +83,10 @@ app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
+        Path.Combine("C:\\Users\\jvsdi\\", "Uploads")),
     RequestPath = "/uploads"
 });
 app.UseRouting();
-
 
 // Usar sessão antes de autenticação e autorização
 app.UseSession();
