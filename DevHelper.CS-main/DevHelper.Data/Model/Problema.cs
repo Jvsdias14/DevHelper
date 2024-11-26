@@ -20,4 +20,13 @@ public partial class Problema
     public virtual ICollection<Solucao> Solucaos { get; set; } = new List<Solucao>();
 
     public virtual Usuario Usuario { get; set; } = null!;
+
+ 
+
+    public DateTime Data { get; set; }
+
+
+    public int? LikeCount { get; set; }
+
+    public int? DislikeCount { get; set; }
 }

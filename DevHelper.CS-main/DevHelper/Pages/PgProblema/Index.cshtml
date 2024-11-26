@@ -39,7 +39,6 @@
                     @if (item.Descricao.Length > 100)
                     {
                         @TruncateDescription(item.Descricao, 100)
-
                         <span class="leia-mais-separator">...</span> <a href="@Url.Page("/PgProblema/Details", new { Id = item.Id })" class="leia-mais-link">Leia mais</a>
                     }
                     else
@@ -75,6 +74,11 @@
                     }
                 </div>
             }
+            <!-- Adiciona os botões de Like e Dislike -->
+            <div>
+                <button class="btn-like" data-id="@item.Id">👍 Like (@item.LikeCount)</button>
+                <button class="btn-dislike" data-id="@item.Id">👎 Dislike (@item.DislikeCount)</button>
+            </div>
         </div>
         <hr />
     }
@@ -87,89 +91,31 @@
                 window.location.href = this.dataset.url;
             });
         });
+
+        document.querySelectorAll('.btn-like').forEach(button => {
+            button.addEventListener('click', function () {
+                var problemaId = this.getAttribute('data-id');
+                fetch(`/PgProblema/Like/${problemaId}`, {
+                    method: 'POST'
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        this.textContent = `👍 Like (${data.likeCount})`;
+                    }
+                });
+            });
+        });
+
+        document.querySelectorAll('.btn-dislike').forEach(button => {
+            button.addEventListener('click', function () {
+                var problemaId = this.getAttribute('data-id');
+                fetch(`/PgProblema/Dislike/${problemaId}`, {
+                    method: 'POST'
+                }).then(response => response.json()).then(data => {
+                    if (data.success) {
+                        this.textContent = `👎 Dislike (${data.dislikeCount})`;
+                    }
+                });
+            });
+        });
     </script>
 }
-
-<style>
-    .feed-container {
-        margin-top: 20px;
-    }
-
-    .feed-item {
-        margin-bottom: 20px;
-        padding-bottom: 10px;
-        border-bottom: 1px solid #ddd;
-    }
-
-        .feed-item div {
-            margin-bottom: 10px;
-        }
-
-    .clickable-label, .clickable-card, .leia-mais-link {
-        cursor: pointer;
-        color: #000;
-        text-decoration: none;
-    }
-
-        .clickable-label:hover, .clickable-card:hover, .leia-mais-link:hover {
-            text-decoration: underline;
-            color: #000; /* Manter a cor preta ao passar o mouse */
-        }
-
-    .leia-mais-separator {
-        display: inline-block;
-        margin-right: 5px; /* Espaço entre a descrição e o link Leia mais */
-    }
-
-    .card-deck {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 20px;
-    }
-
-    .card {
-        background-color: #fff;
-        border: 1px solid #ddd;
-        border-radius: 5px;
-        box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-        width: calc(33.333% - 20px);
-        margin-bottom: 20px;
-        cursor: pointer;
-        transition: transform 0.2s;
-    }
-
-        .card:hover {
-            transform: scale(1.02);
-        }
-
-    .card-body {
-        padding: 15px;
-    }
-
-    .card-text {
-        margin: 0;
-        color: #000;
-        text-decoration: none;
-    }
-
-    .btn.btn-custom, .btn.btn-load-more {
-        background-color: #22ffb6;
-        color: #000;
-        border: none;
-        padding: 10px 20px;
-        cursor: pointer;
-        text-decoration: none;
-        display: inline-block;
-    }
-
-        .btn.btn-custom:hover, .btn.btn-load-more:hover {
-            background-color: #1ccc9a;
-            color: #fff;
-        }
-
-    .file-count {
-        color: #22ffb6;
-        font-weight: bold;
-        margin-left: 5px;
-    }
-</style>
