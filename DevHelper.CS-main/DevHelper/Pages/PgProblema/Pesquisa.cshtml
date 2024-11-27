@@ -2,7 +2,7 @@
 @model DevHelper.Razor.Pages.PgProblema.PesquisaModel
 
 @{
-    ViewData["Title"] = "Search Results";
+    ViewData["Title"] = "Resultados da Pesquisa";
 }
 
 <h2>Resultados da Pesquisa</h2>
@@ -29,6 +29,13 @@
                     <strong>Descrição:</strong>
                     <textarea class="form-control" rows="3" readonly>@item.Descricao</textarea>
                 </div>
+                @if (item.ArquivoProblemas != null && item.ArquivoProblemas.Any())
+                {
+                    <div class="mb-3">
+                        <strong>Arquivos:</strong>
+                        <span class="file-count">(@item.ArquivoProblemas.Count())</span>
+                    </div>
+                }
             </div>
             <hr />
         }
@@ -77,5 +84,11 @@
     .form-control[readonly] {
         background-color: #f8f9fa;
         border-color: #ced4da;
+    }
+
+    .file-count {
+        color: #22ffb6;
+        font-weight: bold;
+        margin-left: 5px;
     }
 </style>
