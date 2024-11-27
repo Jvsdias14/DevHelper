@@ -76,9 +76,16 @@ namespace DevHelper.Data.Repositories
         public async Task<List<Problema>> Pesquisar(string query)
         {
              
-            return await db.Problemas
+            var problemas = await db.Problemas
                 .Where(p => p.Nome.Contains(query))
                 .ToListAsync();
+            foreach (var problema in problemas)
+            {
+                problema.Usuario = await db.Usuarios.FindAsync(problema.UsuarioId);
+                problema.Solucaos = await db.Solucoes.Where(s => s.ProblemaId == problema.Id).ToListAsync();
+                problema.ArquivoProblemas = await db.ArquivoProblemas.Where(a => a.ProblemaId == problema.Id).ToListAsync();
+            }
+            return problemas;
         }
 
         public async Task<List<Problema>> SelecionarProblemaComTudo()

@@ -19,11 +19,16 @@
         <h5>
             @Html.DisplayNameFor(model => model.Problema.Descricao)
         </h5>
-        <form method="post">
+        <form method="post" enctype="multipart/form-data">
+            <input type="hidden" asp-for="Problema.Nome" />
+            <input type="hidden" asp-for="Problema.UsuarioId" />
+            <input type="hidden" id="filesToRemoveInput" name="FilesToRemove" />
         <dd>
                 @if (isOwner)
                 {
                 <textarea class="form-control" asp-for="Problema.Descricao" rows="10">@Model.Problema.Descricao</textarea>
+                <h5>Adicionar Arquivos</h5>
+                <input type="file" id="fileInput" name="UploadedFiles" multiple class="form-control" />
                 }
                 else
                 {
@@ -51,6 +56,10 @@
                             var arquivo = Model.Problema.ArquivoProblemas.ElementAt(i);
                             <div class="carousel-item @(i == 0 ? "active" : "")">
                                 <img src="@Url.Content("~/uploads/" + arquivo.Nome)" alt="@arquivo.Nome" class="d-block w-100" />
+                                @if (isOwner)
+                                {
+                                    <button type="button" class="btn btn-danger btn-sm mt-2" onclick="removeFile('@arquivo.Id')">Remover</button>
+                                }
                             </div>
                         }
                     </div>
@@ -93,11 +102,14 @@ else
 
 @section Scripts {
     <script>
-        document.querySelectorAll('.clickable-label').forEach(label => {
-            label.addEventListener('click', function () {
-                window.location.href = this.dataset.url;
-            });
-        });
+        let filesToRemove = [];
+
+        function removeFile(fileId) {
+            filesToRemove.push(fileId);
+            const fileElement = document.querySelector(`button[onclick="removeFile('${fileId}')"]`).parentNode;
+            fileElement.parentNode.removeChild(fileElement);
+            document.getElementById('filesToRemoveInput').value = JSON.stringify(filesToRemove);
+        }
     </script>
 }
 
@@ -150,6 +162,9 @@ else
 
     .description {
         width: 60%;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
     }
 
     .divider {

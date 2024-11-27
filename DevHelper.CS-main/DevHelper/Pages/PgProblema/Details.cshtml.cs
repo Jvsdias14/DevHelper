@@ -7,6 +7,9 @@ using Microsoft.AspNetCore.Mvc.RazorPages;
 using DevHelper.Data.Model;
 using DevHelper.Data.Interfaces;
 using DevHelper.Data.Interface;
+using Microsoft.AspNetCore.Http;
+using System.IO;
+using Newtonsoft.Json;
 
 namespace DevHelper.Razor.Pages.PgProblema
 {
@@ -15,17 +18,25 @@ namespace DevHelper.Razor.Pages.PgProblema
         private readonly iProblemaRepositoryAsync Repository;
         private readonly iUsuarioRepositoryAsync UsuarioRepository;
         private readonly iSolucaoRepositoryAsync SolucaoRepository;
+        private readonly iArquivoProblemaRepositoryAsync ArquivoProblemaRepository;
 
-        public DetailsModel(iProblemaRepositoryAsync problemaRepositoryAsync, iUsuarioRepositoryAsync usuariorepositoryasync, iSolucaoRepositoryAsync solucaoRepository)
+        private const string UploadsFolderPath = @"C:\Users\jvsdi\Uploads";
+
+        public DetailsModel(iProblemaRepositoryAsync problemaRepositoryAsync, iUsuarioRepositoryAsync usuariorepositoryasync, iSolucaoRepositoryAsync solucaoRepository, iArquivoProblemaRepositoryAsync arquivoproblemarepository)
         {
             Repository = problemaRepositoryAsync;
             UsuarioRepository = usuariorepositoryasync;
             SolucaoRepository = solucaoRepository;
+            ArquivoProblemaRepository = arquivoproblemarepository;
         }
 
         [BindProperty]
         public Problema Problema { get; set; } = default!;
         public Usuario Usuario { get; set; } = default!;
+        [BindProperty]
+        public List<IFormFile> UploadedFiles { get; set; } = new List<IFormFile>();
+        [BindProperty]
+        public string FilesToRemove { get; set; }
 
         public async Task<IActionResult> OnGetAsync(int? id)
         {
@@ -35,13 +46,10 @@ namespace DevHelper.Razor.Pages.PgProblema
             }
 
             var problema = await Repository.ProblemaCompletoAsync(id.Value);
-            //var usuario = await UsuarioRepository.SelecionaPelaChaveAsync(problema.UsuarioId);
-            //var solucoes = await SolucaoRepository.SeleccionarSolucoesPorProblema(problema.Id);
-
-            //foreach (var solucao in solucoes)
-            //{
-            //    solucao.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(solucao.UsuarioId);
-            //}
+            foreach (var solucao in problema.Solucaos)
+            {
+                solucao.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(solucao.UsuarioId);
+            }
 
             if (problema == null)
             {
@@ -56,12 +64,8 @@ namespace DevHelper.Razor.Pages.PgProblema
 
         public async Task<IActionResult> OnPostAsync(int id)
         {
-            //if (!ModelState.IsValid)
-            //{
-            //    return Page();
-            //}
 
-            var problemaToUpdate = await Repository.SelecionaPelaChaveAsync(id);
+            var problemaToUpdate = await Repository.ProblemaCompletoAsync(id);
             if (problemaToUpdate == null)
             {
                 return NotFound();
@@ -69,7 +73,64 @@ namespace DevHelper.Razor.Pages.PgProblema
 
             // Atualizar a descrição com o novo valor vindo do front-end
             problemaToUpdate.Descricao = Problema.Descricao;
+            //Problema = problemaToUpdate;
 
+            // Processar arquivos removidos
+            if (!string.IsNullOrEmpty(FilesToRemove))
+            {
+                var filesToRemove = JsonConvert.DeserializeObject<List<int>>(FilesToRemove);
+                foreach (var fileId in filesToRemove)
+                {
+                    var arquivo = await ArquivoProblemaRepository.SelecionaPelaChaveAsync(fileId);
+                    if (arquivo != null)
+                    {
+                        var filePath = Path.Combine(UploadsFolderPath, arquivo.Nome);
+                        if (System.IO.File.Exists(filePath))
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        await ArquivoProblemaRepository.ExcluirAsync(arquivo);
+                    }
+                }
+            }
+
+            // Processar novos arquivos enviados
+            if (UploadedFiles != null && UploadedFiles.Count > 0)
+            {
+                foreach (var file in UploadedFiles)
+                {
+                    if (file.Length > 0)
+                    {
+                        var filePath = Path.Combine(UploadsFolderPath, file.FileName);
+
+                        if (!Directory.Exists(UploadsFolderPath))
+                        {
+                            Directory.CreateDirectory(UploadsFolderPath);
+                        }
+
+                        using (var stream = new FileStream(filePath, FileMode.Create))
+                        {
+                            await file.CopyToAsync(stream);
+                        }
+
+                        var arquivoProblema = new ArquivoProblema
+                        {
+                            ProblemaId = problemaToUpdate.Id,
+                            Nome = file.FileName,
+                            Referencia = filePath
+                        };
+
+                        await ArquivoProblemaRepository.IncluirAsync(arquivoProblema);
+                    }
+                }
+            }
+            ModelState.Remove("FilesToRemove");
+            ModelState.Remove("Problema.Usuario");
+            ModelState.Remove("Problema.Nome");
+            if (!ModelState.IsValid)
+            {
+                return Page();
+            }
             // Salvar as alterações no banco de dados
             await Repository.AlterarAsync(problemaToUpdate);
 

@@ -37,12 +37,6 @@ namespace DevHelper.Razor.Pages.PgProblema
 
             Problemas = await Repository.Pesquisar(query);
 
-            // Carregar os usuários associados aos problemas
-            foreach (var problema in Problemas)
-            {
-                problema.Usuario = await UsuarioRepository.SelecionaPelaChaveAsync(problema.UsuarioId);
-            }
-
             return Page();
         }
     }
