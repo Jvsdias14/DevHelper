@@ -4,15 +4,14 @@ using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
 using System.Threading.Tasks;
-using static Microsoft.EntityFrameworkCore.DbLoggerCategory;
 
 namespace DevHelper.Data.Repository
 {
     public class SolucaoRepository : iSolucaoRepository, iSolucaoRepositoryAsync
     {
-        private DBdevhelperContext db;
+        private readonly DBdevhelperContext db;
+
         public SolucaoRepository(DBdevhelperContext context)
         {
             db = context;
@@ -20,25 +19,25 @@ namespace DevHelper.Data.Repository
 
         public void Alterar(Solucao solucao)
         {
-            db.Entry(solucao).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            db.Entry(solucao).State = EntityState.Modified;
             db.SaveChanges();
         }
 
         public async Task AlterarAsync(Solucao solucao)
         {
-            db.Entry(solucao).State = Microsoft.EntityFrameworkCore.EntityState.Modified;
+            db.Entry(solucao).State = EntityState.Modified;
             await db.SaveChangesAsync();
         }
 
         public void Excluir(Solucao solucao)
         {
-            db.Entry(solucao).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            db.Entry(solucao).State = EntityState.Deleted;
             db.SaveChanges();
         }
 
         public async Task ExcluirAsync(Solucao solucao)
         {
-            db.Entry(solucao).State = Microsoft.EntityFrameworkCore.EntityState.Deleted;
+            db.Entry(solucao).State = EntityState.Deleted;
             await db.SaveChangesAsync();
         }
 
@@ -53,8 +52,6 @@ namespace DevHelper.Data.Repository
             db.Solucoes.Add(solucao);
             await db.SaveChangesAsync();
         }
-
-        
 
         public Solucao SelecionaPelaChave(int id)
         {
@@ -78,9 +75,7 @@ namespace DevHelper.Data.Repository
 
         public async Task<List<Solucao>> SeleccionarSolucoesPorProblema(int idproblema)
         {
-            return await db.Solucoes 
-                .Where(p => p.ProblemaId == idproblema)
-                .ToListAsync();
+            return await db.Solucoes.Where(p => p.ProblemaId == idproblema).ToListAsync();
         }
     }
 }

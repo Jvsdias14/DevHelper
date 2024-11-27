@@ -1,20 +1,21 @@
 using DevHelper.Data.Interface;
 using DevHelper.Data.Interfaces;
 using DevHelper.Data.Model;
-using DevHelper.Data.Repository;
 using DevHelper.Data.Repositories;
-using Microsoft.EntityFrameworkCore;
+using DevHelper.Data.Repository;
 using Microsoft.AspNetCore.Authentication.Cookies;
-using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Authentication;
-using System.Security.Claims;
 using Microsoft.AspNetCore.Http.Features;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.FileProviders;
+using System.Security.Claims;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container
 builder.Services.AddRazorPages().AddRazorRuntimeCompilation();
+builder.Services.AddControllers(); // Adicionar controladores
 
 var config = builder.Configuration;
 
@@ -83,7 +84,7 @@ app.UseStaticFiles();
 app.UseStaticFiles(new StaticFileOptions
 {
     FileProvider = new PhysicalFileProvider(
-        Path.Combine("C:\\Users\\jvsdi\\", "Uploads")),
+        Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
     RequestPath = "/uploads"
 });
 app.UseRouting();
@@ -114,6 +115,11 @@ app.Use(async (context, next) =>
     await next.Invoke();
 });
 
-app.MapRazorPages();
+// Configuração de rotas para controladores
+app.UseEndpoints(endpoints =>
+{
+    endpoints.MapRazorPages();
+    endpoints.MapControllers(); // Adicionar mapeamento para controladores
+});
 
 app.Run();

@@ -65,6 +65,10 @@
                             <div class="card clickable-card" data-url="@Url.Page("/PgSolucao/Details", new { Id = solucao.Id })">
                                 <div class="card-body">
                                     <p class="card-text">@solucao.Descricao</p>
+                                    <div class="like-dislike-container">
+                                        <span>👍 @solucao.LikeCount</span>
+                                        <span>👎 @solucao.DislikeCount</span>
+                                    </div>
                                 </div>
                             </div>
                         }
@@ -171,5 +175,11 @@
         color: #22ffb6;
         font-weight: bold;
         margin-left: 5px;
+    }
+
+    .like-dislike-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
     }
 </style>

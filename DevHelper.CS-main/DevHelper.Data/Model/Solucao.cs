@@ -13,6 +13,9 @@ public partial class Solucao
 
     public string Descricao { get; set; } = null!;
 
+    public int LikeCount { get; set; } // Adiciona a propriedade LikeCount
+    public int DislikeCount { get; set; } // Adiciona a propriedade DislikeCount
+
     public virtual ICollection<ArquivoSolucao> ArquivoSolucaos { get; set; } = new List<ArquivoSolucao>();
 
     public virtual Problema Problema { get; set; } = null!;

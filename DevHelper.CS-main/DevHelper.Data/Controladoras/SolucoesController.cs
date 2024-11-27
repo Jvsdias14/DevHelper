@@ -1,29 +1,48 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
-using DevHelper.Data.Interfaces;
+using DevHelper.Data.Model;
 
 namespace DevHelper.Data.Controladoras
 {
-    [Route("api/[controller]")]
+    [Route("Solucoes")]
     [ApiController]
     public class SolucoesController : ControllerBase
     {
-        private readonly iProblemaRepositoryAsync _problemaRepository;
+        private readonly DBdevhelperContext _context;
 
-        public SolucoesController(iProblemaRepositoryAsync problemaRepository)
+        public SolucoesController(DBdevhelperContext context)
         {
-            _problemaRepository = problemaRepository;
+            _context = context;
         }
 
-        [HttpGet("{problemaId}/solucoes/restantes")]
-        public async Task<IActionResult> GetSolucoesRestantes(int problemaId, int carregadas)
+        [HttpPost("Like/{id}")]
+        public async Task<IActionResult> Like(int id)
         {
-            var solucoes = await _problemaRepository.BuscarSolucoesRestantesAsync(problemaId, carregadas);
-            return Ok(solucoes);
+            var solucao = await _context.Solucoes.FindAsync(id);
+            if (solucao == null)
+            {
+                return NotFound();
+            }
+
+            solucao.LikeCount++;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { likeCount = solucao.LikeCount });
+        }
+
+        [HttpPost("Dislike/{id}")]
+        public async Task<IActionResult> Dislike(int id)
+        {
+            var solucao = await _context.Solucoes.FindAsync(id);
+            if (solucao == null)
+            {
+                return NotFound();
+            }
+
+            solucao.DislikeCount++;
+            await _context.SaveChangesAsync();
+
+            return Ok(new { dislikeCount = solucao.DislikeCount });
         }
     }
 }

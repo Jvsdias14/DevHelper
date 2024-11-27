@@ -6,24 +6,46 @@
 
 @{
     ViewData["Title"] = "Detalhes da Solução";
-    var user = HttpContextAccessor.HttpContext.User;
-    var userId = user.FindFirstValue(ClaimTypes.NameIdentifier);
-    var isOwner = userId == Model.Solucao.UsuarioId.ToString();
+    var user = HttpContextAccessor?.HttpContext?.User;
+    var userId = user?.FindFirstValue(ClaimTypes.NameIdentifier);
+    var isOwner = userId != null && Model.Solucao != null && userId == Model.Solucao.UsuarioId.ToString();
 }
 
 <h1>Detalhes da Solução</h1>
 <hr />
 <div>
-    <h4>@Html.DisplayFor(model => model.Problema.Nome)</h4>
-    <hr />
-    <dl class="row">
-        <dt class="col-sm-2">Descrição</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Solucao.Descricao)</dd>
-        <dt class="col-sm-2">Problema</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Problema.Nome)</dd>
-        <dt class="col-sm-2">Usuário</dt>
-        <dd class="col-sm-10">@Html.DisplayFor(model => model.Usuario.Nome)</dd>
-    </dl>
+    @if (Model.Solucao != null && Model.Problema != null)
+    {
+        <h4>@Html.DisplayFor(model => model.Problema.Nome)</h4>
+        <hr />
+        <dl class="row">
+            <dt class="col-sm-2">Descrição</dt>
+            <dd class="col-sm-10">@Html.DisplayFor(model => model.Solucao.Descricao)</dd>
+            <dt class="col-sm-2">Problema</dt>
+            <dd class="col-sm-10">@Html.DisplayFor(model => model.Problema.Nome)</dd>
+            <dt class="col-sm-2">Usuário</dt>
+            <dd class="col-sm-10">@Html.DisplayFor(model => model.Usuario.Nome)</dd>
+        </dl>
+    }
+    else
+    {
+        <p>Erro: Detalhes da solução ou problema não encontrados.</p>
+    }
+</div>
+
+<div class="like-dislike-container">
+    @if (Model.Solucao != null)
+    {
+        <!-- Botão para Curtir -->
+        <button type="button" class="like-button" data-id="@Model.Solucao.Id">👍 <span id="like-count">@Model.Solucao.LikeCount</span></button>
+
+        <!-- Botão para Não Curtir -->
+        <button type="button" class="dislike-button" data-id="@Model.Solucao.Id">👎 <span id="dislike-count">@Model.Solucao.DislikeCount</span></button>
+    }
+    else
+    {
+        <p>Erro: Solução não encontrada.</p>
+    }
 </div>
 
 @if (isOwner)
@@ -32,6 +54,28 @@
         <a asp-page="/PgSolucao/Edit" asp-route-id="@Model.Solucao.Id" class="btn btn-custom me-2">Editar</a>
         <a asp-page="/PgSolucao/Delete" asp-route-id="@Model.Solucao.Id" class="btn btn-danger">Deletar</a>
     </div>
+}
+
+@section Scripts {
+    <script>
+        document.querySelector('.like-button').addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            fetch('/Solucoes/Like/' + id, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('like-count').textContent = data.likeCount;
+                });
+        });
+
+        document.querySelector('.dislike-button').addEventListener('click', function() {
+            var id = this.getAttribute('data-id');
+            fetch('/Solucoes/Dislike/' + id, { method: 'POST' })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('dislike-count').textContent = data.dislikeCount;
+                });
+        });
+    </script>
 }
 
 <style>
@@ -83,5 +127,20 @@
 
     .align-items-center {
         align-items: center;
+    }
+
+    .like-dislike-container {
+        display: flex;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 20px;
+    }
+
+    .like-button, .dislike-button {
+        background: none;
+        border: none;
+        cursor: pointer;
+        font-size: 1em;
+        color: #000;
     }
 </style>
